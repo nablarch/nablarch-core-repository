@@ -1,0 +1,7 @@
+<component-configuration xmlns="http://tis.co.jp/nablarch/component-configuration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://tis.co.jp/nablarch/component-configuration component-configuration.xsd">
+
+  <!-- 存在しないタグ -->
+  <componen name="comp1" class="nablarch.core.repository.di.test.Component1">
+  </componen>
+</component-configuration>

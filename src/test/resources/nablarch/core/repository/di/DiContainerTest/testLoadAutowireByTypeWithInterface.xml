@@ -1,0 +1,10 @@
+<component-configuration xmlns="http://tis.co.jp/nablarch/component-configuration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://tis.co.jp/nablarch/component-configuration component-configuration.xsd">
+  <component name="comp6" class="nablarch.core.repository.di.test.Component6">
+    <!-- interface1 のインジェクション設定なし -->
+    <!-- Component5が設定される -->
+  </component>
+  <component name="comp5" class="nablarch.core.repository.di.test.Component5">
+    <property name="message" value="this is message" />
+  </component>
+</component-configuration>

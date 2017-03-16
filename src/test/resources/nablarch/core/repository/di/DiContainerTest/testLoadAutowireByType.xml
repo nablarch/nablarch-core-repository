@@ -1,0 +1,10 @@
+<component-configuration xmlns="http://tis.co.jp/nablarch/component-configuration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://tis.co.jp/nablarch/component-configuration component-configuration.xsd">
+  <component name="comp1" class="nablarch.core.repository.di.test.Component1">
+    <property name="prop1" value="string value" />
+    <!-- component2 のインジェクション設定なし(オートワイヤ) -->
+  </component>
+  <component name="comp2" class="nablarch.core.repository.di.test.Component2">
+    <property name="prop1" value="prop2" />
+  </component>
+</component-configuration>

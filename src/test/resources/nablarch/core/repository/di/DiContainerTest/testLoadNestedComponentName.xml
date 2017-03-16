@@ -1,0 +1,16 @@
+<component-configuration xmlns="http://tis.co.jp/nablarch/component-configuration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://tis.co.jp/nablarch/component-configuration component-configuration.xsd">
+  <component name="nest1" class="nablarch.core.repository.di.test.NestedComponent">
+    <property name="stringProp" value="nest1"/>
+    <property name="child">
+      <component name="child" class="nablarch.core.repository.di.test.NestedComponent">
+        <property name="stringProp" value="nest2"/>
+        <property name="child">
+          <component name="child" class="nablarch.core.repository.di.test.NestedComponent">
+            <property name="stringProp" value="nest3"/>
+          </component>
+        </property>
+      </component>
+    </property>
+  </component>
+</component-configuration>

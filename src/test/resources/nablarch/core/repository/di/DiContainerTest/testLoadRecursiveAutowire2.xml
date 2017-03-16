@@ -1,0 +1,10 @@
+<component-configuration xmlns="http://tis.co.jp/nablarch/component-configuration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://tis.co.jp/nablarch/component-configuration component-configuration.xsd">
+  <component name="comp1" class="nablarch.core.repository.di.test.CyclicReferenceComponent1">
+  </component>
+  <component name="comp2" class="nablarch.core.repository.di.test.CyclicReferenceComponent2">
+  </component>
+  <component name="comp3" class="nablarch.core.repository.di.test.CyclicReferenceComponent3">
+    <property name="component" ref="comp1"/>
+  </component>
+</component-configuration>

@@ -1,0 +1,10 @@
+<component-configuration xmlns="http://tis.co.jp/nablarch/component-configuration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://tis.co.jp/nablarch/component-configuration component-configuration.xsd">
+  <!-- 循環参照するコンポーネントファクトリ -->
+  <component name="ref1" class="nablarch.core.repository.di.test.RecursiveRefComponentFactory">
+    <property name="ref" ref="ref2" />
+  </component>
+  <component name="ref2" class="nablarch.core.repository.di.test.RecursiveRefComponentFactory">
+    <property name="ref" ref="ref1" />
+  </component>
+</component-configuration>

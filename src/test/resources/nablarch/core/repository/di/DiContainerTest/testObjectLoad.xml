@@ -1,0 +1,15 @@
+<component-configuration xmlns="http://tis.co.jp/nablarch/component-configuration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://tis.co.jp/nablarch/component-configuration component-configuration.xsd">
+  <component class="nablarch.core.repository.di.test.CustomObjectLoader">
+    <property name="values">
+      <map>
+        <entry key="key1" value="value1"/>
+        <entry key="key2" value="value2"/>
+        <entry key="key3" value="value3"/>
+      </map>
+    </property>
+  </component>
+  <component name="comp1" class="nablarch.core.repository.di.test.Component2">
+    <property name="prop1" value="${key1}"/>
+  </component>
+</component-configuration>

@@ -1,0 +1,7 @@
+<component-configuration xmlns="http://tis.co.jp/nablarch/component-configuration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://tis.co.jp/nablarch/component-configuration component-configuration.xsd">
+
+  <!-- 正しくない位置にentryタグ -->
+  <entry>
+  </entry>
+</component-configuration>

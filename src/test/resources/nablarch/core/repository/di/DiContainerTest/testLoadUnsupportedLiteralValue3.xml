@@ -1,0 +1,6 @@
+<component-configuration xmlns="http://tis.co.jp/nablarch/component-configuration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://tis.co.jp/nablarch/component-configuration component-configuration.xsd">
+  <component name="comp1" class="nablarch.core.repository.di.test.Component1">
+    <property name="integerArrayProp" value="1,a,3" />
+  </component>
+</component-configuration>

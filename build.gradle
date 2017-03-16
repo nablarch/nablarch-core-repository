@@ -10,7 +10,7 @@ buildscript {
   }
   dependencies {
     classpath "com.nablarch.dev:nablarch-gradle-plugin:${nablarchGradlePluginVersion}"
-    classpath "net.saliman:gradle-cobertura-plugin:2.2.3"
+    classpath "net.saliman:gradle-cobertura-plugin:2.4.0"
   }
 }
 apply plugin: 'com.nablarch.dev.nablarch-build'
@@ -23,17 +23,20 @@ apply plugin: 'com.nablarch.dev.nablarch-version'
 sourceCompatibility=JavaVersion.VERSION_1_6
 targetCompatibility=JavaVersion.VERSION_1_6
 
+
+configurations {
+  all*.exclude module: 'nablarch-test-support-hereis'
+  all*.exclude module: 'h2'
+  all*.exclude module: 'commons-dbcp'
+  all*.exclude module: 'eclipselink'
+  all*.exclude module: 'jsp-api-2.1-glassfish'
+}
+
 dependencies {
   compile "com.nablarch.framework:nablarch-core:${nablarchCoreVersion}"
 
-  testCompile 'com.nablarch.dev:nablarch-test-support:0.0.5'
-  testCompile 'com.nablarch.dev:nablarch-test-support-hereis:1.0.0'
-  testCompile 'com.nablarch.framework:nablarch-core-applog:1.0.1'
-
-  // for hereis
-  testRuntime files('src/test/java/')
-
-  cobertura "net.sourceforge.cobertura:cobertura:1.9.4"
+  testCompile "com.nablarch.framework:nablarch-core-applog:${nablarchCoreApplogVersion}"
+  testRuntime 'org.slf4j:slf4j-nop:1.7.24'
 }
 
 test {
@@ -88,6 +91,6 @@ tasks.sonarRunner {
 }
 
 task wrapper(type: Wrapper) {
-  gradleVersion = '2.4'
+  gradleVersion = '2.13'
 }
 

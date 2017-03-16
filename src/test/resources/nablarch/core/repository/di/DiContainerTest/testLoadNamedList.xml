@@ -1,0 +1,18 @@
+<component-configuration xmlns="http://tis.co.jp/nablarch/component-configuration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://tis.co.jp/nablarch/component-configuration component-configuration.xsd">
+  <list name="testList">
+    <component class="nablarch.core.repository.di.test.Component2">
+      <property name="prop1" value="prop1-1" />
+    </component>
+    <value>strval1</value>
+    <component class="nablarch.core.repository.di.test.Component2">
+      <property name="prop1" value="prop1-2" />
+    </component>
+    <component-ref name="outerComponent"/>
+    <value>strval2</value>
+  </list>
+
+  <component name="outerComponent" class="nablarch.core.repository.di.test.Component2">
+    <property name="prop1" value="prop1-3" />
+  </component>
+</component-configuration>

@@ -1,0 +1,16 @@
+<component-configuration xmlns="http://tis.co.jp/nablarch/component-configuration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://tis.co.jp/nablarch/component-configuration component-configuration.xsd">
+  <component name="comp1" class="nablarch.core.repository.di.test.Component1">
+    <property name="prop1" value="string value" />
+    <property name="boolProp" value="true" />
+    <property name="wrapBoolProp" value="true" />
+    <property name="intProp" value="2" />
+    <property name="wrapIntProp" value="3" />
+    <property name="longProp" value="5" />
+    <property name="wrapLongProp" value="6" />
+    <property name="arrayProp1" value="abc,def,,ghi," />
+    <property name="arrayProp2" value="abc,def,ghi" />
+    <property name="intArrayProp" value="1,2,3" />
+    <property name="integerArrayProp" value="4,5,6" />
+  </component>
+</component-configuration>

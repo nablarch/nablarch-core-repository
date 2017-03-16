@@ -1,0 +1,17 @@
+<component-configuration xmlns="http://tis.co.jp/nablarch/component-configuration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://tis.co.jp/nablarch/component-configuration component-configuration.xsd">
+  <component name="comp6" class="nablarch.core.repository.di.test.Component6">
+    <property name="interface1" >
+      <component name="comp5" class="nablarch.core.repository.di.test.Component5">
+        <property name="message" value="message1" />
+      </component>
+    </property>
+  </component>
+  <component name="comp6" class="nablarch.core.repository.di.test.Component6">
+    <property name="interface1" >
+      <component name="comp5" class="nablarch.core.repository.di.test.Component5">
+        <property name="message" value="message2" />
+      </component>
+    </property>
+  </component>
+</component-configuration>

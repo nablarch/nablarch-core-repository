@@ -1,0 +1,21 @@
+<component-configuration xmlns="http://tis.co.jp/nablarch/component-configuration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://tis.co.jp/nablarch/component-configuration component-configuration.xsd">
+  <component name="comp1" class="nablarch.core.repository.di.test.Component1">
+    <!-- 上書きされない設定 -->
+    <property name="prop1" value="base value" />
+    <!-- 上書きされる設定 -->
+    <property name="boolProp" value="false" />
+  </component>
+  <component name="comp1" class="nablarch.core.repository.di.test.Component1">
+    <!-- 上書きされる設定 -->
+    <property name="boolProp" value="true" />
+    <!-- 追加の設定 -->
+    <property name="intProp" value="100" />
+  </component>
+  <component name="comp6" class="nablarch.core.repository.di.test.Component6">
+  </component>
+  <component name="comp6" class="nablarch.core.repository.di.test.Component6">
+  </component>
+  <component name="comp5" class="nablarch.core.repository.di.test.Component5">
+  </component>
+</component-configuration>

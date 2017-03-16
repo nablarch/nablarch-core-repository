@@ -1,0 +1,6 @@
+<!-- nablarch.core.repository.di.test.Component8 には正しくない setter が含まれている。-->
+<component-configuration xmlns="http://tis.co.jp/nablarch/component-configuration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://tis.co.jp/nablarch/component-configuration component-configuration.xsd">
+  <component name="component8" class="nablarch.core.repository.di.test.Component8">
+  </component>
+</component-configuration>

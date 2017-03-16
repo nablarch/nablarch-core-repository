@@ -1,0 +1,28 @@
+<component-configuration xmlns="http://tis.co.jp/nablarch/component-configuration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://tis.co.jp/nablarch/component-configuration component-configuration.xsd">
+  <component name="component2" class="nablarch.core.repository.di.test.Component2">
+    <property name="prop1" value="prop1-1" />
+  </component>
+  <component name="key-component" class="nablarch.core.repository.di.test.Component2">
+    <property name="prop1" value="prop1-3" />
+  </component>
+  <component name="component3" class="nablarch.core.repository.di.test.Component3">
+    <property name="mapProp" >
+      <map>
+        <entry key="key1" value="value1"/>
+        <entry key="key2" value-name="component2"/>
+        <entry key="key3" >
+          <value-component class="nablarch.core.repository.di.test.Component2">
+            <property name="prop1" value="prop1-2" />
+          </value-component>
+        </entry>
+        <entry key-name="key-component" value="value2"/>
+        <entry value="value3">
+          <key-component class="nablarch.core.repository.di.test.Component2">
+            <property name="prop1" value="prop1-4" />
+          </key-component>
+        </entry>
+      </map>
+    </property>
+  </component>
+</component-configuration>

@@ -1,0 +1,4 @@
+<component-configuration xmlns="http://tis.co.jp/nablarch/component-configuration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://tis.co.jp/nablarch/component-configuration /home/ssd/workspace/Nablarch/resources/component-configuration.xsd">
+  <import file="nablarch/core/repository/di/DiContainerTest/testImportCircularFail1.xml"/>
+</component-configuration>

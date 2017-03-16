@@ -1,0 +1,11 @@
+<component-configuration xmlns="http://tis.co.jp/nablarch/component-configuration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://tis.co.jp/nablarch/component-configuration component-configuration.xsd">
+  <config-file file="nablarch/core/repository/di/ConfigurationOverrideTest/testLoadSystemProperty/test.config" />
+  <component name="comp1" class="nablarch.core.repository.di.test.Component1">
+    <property name="prop1" value="${any.key01}" />
+    <property name="intProp" value="${any.key03}" />
+  </component>
+  <component name="comp2" class="nablarch.core.repository.di.test.Component1">
+    <property name="prop1" value="${any.key02}" />
+  </component>
+</component-configuration>
