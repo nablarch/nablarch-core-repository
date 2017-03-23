@@ -1,0 +1,12 @@
+#This file is used by the JNDI FSContext.
+#Tue Feb 01 08:27:36 JST 2011
+nablarch_test/RefAddr/0/Encoding=String
+nablarch_test/RefAddr/0/Type=name
+nablarch_test/RefAddr/0/Content=abcdefg
+nablarch_test/ClassName=nablarch.core.repository.jndi.JndiHelperTest$Bean
+nablarch_test/FactoryName=nablarch.core.repository.jndi.JndiHelperTest$BeanFactory
+default/RefAddr/0/Encoding=String
+default/RefAddr/0/Type=name
+default/RefAddr/0/Content=12345
+default/ClassName=nablarch.core.repository.jndi.JndiHelperTest$Bean
+default/FactoryName=nablarch.core.repository.jndi.JndiHelperTest$BeanFactory
