@@ -13,10 +13,12 @@ import java.util.TreeMap;
 
 import nablarch.core.log.Logger;
 import nablarch.core.log.LoggerManager;
+import nablarch.core.repository.IgnoreProperty;
 import nablarch.core.repository.ObjectLoader;
 import nablarch.core.repository.initialization.ApplicationInitializer;
 import nablarch.core.util.Builder;
 import nablarch.core.util.ObjectUtil;
+import nablarch.core.util.StringUtil;
 import nablarch.core.util.annotation.Published;
 
 
@@ -452,8 +454,35 @@ public class DiContainer implements ObjectLoader {
             value = getComponentByName(ref.getReferenceName());
         }
         if (value != null) {
+            final String propertyName = ref.getPropertyName();
+            writeIgnorePropertyLog(component.getClass(), propertyName);
             ObjectUtil.setProperty(component, ref.getPropertyName(), value);
         }
+    }
+
+    /**
+     * 廃止されたプロパティの場合、ワーニングログを出力する。
+     *
+     * @param component 対象のクラス
+     * @param propertyName プロパティ
+     */
+    private static void writeIgnorePropertyLog(
+            final Class<?> component, final String propertyName) {
+
+        final Method method = ObjectUtil.getSetterMethod(component, propertyName);
+        final IgnoreProperty ignoreProperty = method.getAnnotation(IgnoreProperty.class);
+        if (ignoreProperty == null) {
+            return;
+        }
+
+        String invalidReason = "";
+        if (StringUtil.hasValue(ignoreProperty.value())) {
+            invalidReason = "(invalid reason:" + ignoreProperty.value() + ')';
+        }
+        LOGGER.logWarn("Setting to this property is invalid" + invalidReason + '.'
+                + " It is recommended to delete the setting."
+                + " class:" + component.getName()
+                + " propertyName:" + propertyName);
     }
 
     /**

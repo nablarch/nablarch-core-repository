@@ -24,8 +24,10 @@ import nablarch.core.repository.di.test.Component4;
 import nablarch.core.repository.di.test.Component6;
 import nablarch.core.repository.di.test.Component8;
 import nablarch.core.repository.di.test.NestedComponent;
+import nablarch.core.repository.test.OnMemoryLogWriter;
 import nablarch.core.repository.test.SystemPropertyResource;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -40,6 +42,11 @@ public class DiContainerTest {
 
     @Rule
     public final SystemPropertyResource systemPropertyResource = new SystemPropertyResource();
+
+    @Before
+    public void setUp() throws Exception {
+        OnMemoryLogWriter.clear();
+    }
 
     /**
      * ObjectLoader が、Mapからの取得順にロードされることを確認する。
@@ -128,6 +135,53 @@ public class DiContainerTest {
         assertThat(map.get("3"), is("30"));
     }
 
+    @Test
+    public void testIgnorePropertyWithReasonMessage_shouldWriteWarnLog() throws Exception {
+        XmlComponentDefinitionLoader loader = new XmlComponentDefinitionLoader(
+                "nablarch/core/repository/di/DiContainerTest/testIgnorePropertyWithReasonMessage_shouldWriteWarnLog/test.xml");
+        new DiContainer(loader);
+        
+        final List<String> messages = OnMemoryLogWriter.getMessages("writer.appLog");
+        String warnMessage = null;
+        for (final String message : messages) {
+            if (message.contains("WARN")) {
+                if (warnMessage != null) {
+                    fail("WARNレベルのログは１つだけであること");
+                }
+                warnMessage = message;
+            }
+        }
+
+        assertThat(warnMessage, allOf(
+                containsString("Setting to this property is invalid(invalid reason:廃止されました。)."),
+                containsString("It is recommended to delete the setting."),
+                containsString("class:nablarch.core.repository.di.test.IgnorePropertyBean propertyName:ignore")
+        ));
+    }
+    
+    @Test
+    public void testIgnorePropertyWithoutReasonMessage_shouldWriteWarnLog() throws Exception {
+        XmlComponentDefinitionLoader loader = new XmlComponentDefinitionLoader(
+                "nablarch/core/repository/di/DiContainerTest/testIgnorePropertyWithoutReasonMessage_shouldWriteWarnLog/test.xml");
+        new DiContainer(loader);
+
+        final List<String> messages = OnMemoryLogWriter.getMessages("writer.appLog");
+        String warnMessage = null;
+        for (final String message : messages) {
+            if (message.contains("WARN")) {
+                if (warnMessage != null) {
+                    fail("WARNレベルのログは１つだけであること");
+                }
+                warnMessage = message;
+            }
+        }
+
+        assertThat(warnMessage, allOf(
+                containsString("Setting to this property is invalid."),
+                containsString("It is recommended to delete the setting."),
+                containsString("class:nablarch.core.repository.di.test.IgnorePropertyBean2 propertyName:ignore")
+        ));
+    }
 
     @Test
     public void testLoadLiteralValue() throws Throwable {
