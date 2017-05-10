@@ -73,14 +73,10 @@ public final class LiteralExpressionUtil {
             
             Object value = container.getComponentByName(key);
             if (value == null) {
-                logWarn("property value was not found."
-                        + " parameter = " + group);
-                continue;
+                throw new ConfigurationLoadException("property value was not found. parameter = " + group);
             }
             if (!(value instanceof String)) {
-                logWarn("property type was not string."
-                        + " parameter = " + group);
-                continue;
+                throw new ConfigurationLoadException("property type was not string. parameter = " + group);
             }
             String valueStr = (String) value;
             

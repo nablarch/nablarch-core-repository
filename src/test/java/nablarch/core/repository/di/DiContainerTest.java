@@ -953,9 +953,12 @@ public class DiContainerTest {
         XmlComponentDefinitionLoader loader = new XmlComponentDefinitionLoader(
                 "nablarch/core/repository/di/DiContainerTest/testPropertyNotFound.xml");
 
-        DiContainer container = new DiContainer(loader);
-        Component1 comp1 = container.getComponentByName("comp1");
-        assertThat(comp1.getProp1(), is("${test.prop}"));
+        DiContainer container = null;
+        try {
+            container = new DiContainer(loader);
+        } catch (ConfigurationLoadException e) {
+            assertThat(e.getMessage(), is("property value was not found. parameter = ${test.prop}"));
+        }
     }
 
     @Test
@@ -963,9 +966,12 @@ public class DiContainerTest {
         XmlComponentDefinitionLoader loader = new XmlComponentDefinitionLoader(
                 "nablarch/core/repository/di/DiContainerTest/testPropertyIsNotString.xml");
 
-        DiContainer container = new DiContainer(loader);
-        Component1 comp1 = container.getComponentByName("comp1");
-        assertThat(comp1.getProp1(), is("${comp2}"));
+        try {
+            DiContainer container = new DiContainer(loader);
+            fail();
+        } catch (ConfigurationLoadException e) {
+            assertThat(e.getMessage(), is("property type was not string. parameter = ${comp2}"));
+        }
     }
 
 
