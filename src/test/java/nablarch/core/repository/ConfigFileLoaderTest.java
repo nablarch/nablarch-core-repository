@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.util.Map;
 
 import org.hamcrest.CoreMatchers;
+import org.hamcrest.Matchers;
 
 import nablarch.core.util.FileUtil;
 
@@ -155,6 +156,17 @@ public class ConfigFileLoaderTest {
         ConfigFileLoader loader = new ConfigFileLoader(createConfigFileName(), null);
         Map<String, Object> valueMap = loader.load();
         assertThat(valueMap.get("key"), CoreMatchers.<Object>is("あいうえお"));
+    }
+
+    @Test
+    public void testSurrogatePair() {
+        final ConfigFileLoader sut = new ConfigFileLoader(createConfigFileName());
+        final Map<String, Object> result = sut.load();
+
+        assertThat("configファイル内の値にサロゲートペアが使用できること", 
+                result, Matchers.<String, Object>hasEntry("key", "[\ud840\udc0b\uD83C\uDF63]"));
+        assertThat("config内のキー値にサロゲートペアが使用できること",
+                result, Matchers.<String, Object>hasEntry("\ud840\udc0b\uD83C\uDF63", "値"));
     }
 
     private String createConfigFileName() {

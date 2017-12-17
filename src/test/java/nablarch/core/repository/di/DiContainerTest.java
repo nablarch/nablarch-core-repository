@@ -24,6 +24,7 @@ import nablarch.core.repository.di.test.Component4;
 import nablarch.core.repository.di.test.Component6;
 import nablarch.core.repository.di.test.Component8;
 import nablarch.core.repository.di.test.NestedComponent;
+import nablarch.core.repository.di.test.SurrogatePair;
 import nablarch.core.repository.test.OnMemoryLogWriter;
 import nablarch.core.repository.test.SystemPropertyResource;
 
@@ -1210,6 +1211,20 @@ public class DiContainerTest {
                     is("file to import not found. path=[classpath:fileNotFound.xml]"));
         }
     }
+
+    /**
+     * xml内に書かれたサロゲートペアが扱えることを検証するケース
+     */
+    @Test
+    public void testSurrogatePair() {
+        XmlComponentDefinitionLoader loader = new XmlComponentDefinitionLoader(
+                "nablarch/core/repository/di/DiContainerTest/testSurrogatePair.xml");
+        final DiContainer sut = new DiContainer(loader);
+
+        final SurrogatePair case2 = sut.getComponentByName("placeHolder");
+        assertThat(case2.getValue(), is("🍣🍣🍣!!!"));
+    }
+    
 
     private static final class MockObjectLoader implements ObjectLoader {
 
