@@ -24,9 +24,11 @@ import nablarch.core.repository.di.test.Component4;
 import nablarch.core.repository.di.test.Component6;
 import nablarch.core.repository.di.test.Component8;
 import nablarch.core.repository.di.test.NestedComponent;
+import nablarch.core.repository.di.test.SurrogatePair;
 import nablarch.core.repository.test.OnMemoryLogWriter;
 import nablarch.core.repository.test.SystemPropertyResource;
 
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -1210,6 +1212,38 @@ public class DiContainerTest {
                     is("file to import not found. path=[classpath:fileNotFound.xml]"));
         }
     }
+    
+    /**
+     * xml内に書かれたサロゲートペアが扱えることを検証するケース
+     */
+    @Test
+    public void testSurrogatePair() {
+        // Java 1.8.0 Update 77以前では以下のバグがあるため、Java6, 7環境ではテストをスキップする。
+        // https://bugs.openjdk.java.net/browse/JDK-8145969
+        Assume.assumeThat(System.getProperty("java.specification.version"), allOf(not("1.6"), not("1.7")));
+        
+        XmlComponentDefinitionLoader loader = new XmlComponentDefinitionLoader(
+                "nablarch/core/repository/di/DiContainerTest/testSurrogatePair.xml");
+        final DiContainer sut = new DiContainer(loader);
+
+        final SurrogatePair case2 = sut.getComponentByName("component");
+        assertThat(case2.getValue(), is("🍣🍣🍣!!!"));
+    }
+
+
+    /**
+     * configファイルを参照した場合(place holder)を使用した場合サロゲートペアが扱えることを検証するケース
+     */
+    @Test
+    public void testSurrogatePair_usePlaceHolder() {
+        XmlComponentDefinitionLoader loader = new XmlComponentDefinitionLoader(
+                "nablarch/core/repository/di/DiContainerTest/testSurrogatePair.xml");
+        final DiContainer sut = new DiContainer(loader);
+
+        final SurrogatePair case2 = sut.getComponentByName("placeHolder");
+        assertThat(case2.getValue(), is("🍣🍣🍣!!!"));
+    }
+    
 
     private static final class MockObjectLoader implements ObjectLoader {
 
