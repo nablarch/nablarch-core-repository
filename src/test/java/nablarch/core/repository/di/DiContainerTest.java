@@ -1218,6 +1218,8 @@ public class DiContainerTest {
      */
     @Test
     public void testSurrogatePair() {
+        // Java 1.8.0 Update 77以前では以下のバグがあるため、Java6, 7環境ではテストをスキップする。
+        // https://bugs.openjdk.java.net/browse/JDK-8145969
         Assume.assumeThat(System.getProperty("java.specification.version"), allOf(not("1.6"), not("1.7")));
         
         XmlComponentDefinitionLoader loader = new XmlComponentDefinitionLoader(
