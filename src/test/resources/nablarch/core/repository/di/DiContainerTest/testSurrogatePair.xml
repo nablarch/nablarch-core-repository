@@ -6,6 +6,10 @@
   
   <config-file file="testSurrogatePair.config" dir="." />
   
+  <component name="component" class="nablarch.core.repository.di.test.SurrogatePair">
+    <property name="value" value="🍣🍣🍣!!!" />
+  </component>
+  
   <component name="placeHolder" class="nablarch.core.repository.di.test.SurrogatePair">
     <property name="value" value="${key}" />
   </component>

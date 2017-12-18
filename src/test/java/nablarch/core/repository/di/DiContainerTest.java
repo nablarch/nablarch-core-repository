@@ -28,6 +28,7 @@ import nablarch.core.repository.di.test.SurrogatePair;
 import nablarch.core.repository.test.OnMemoryLogWriter;
 import nablarch.core.repository.test.SystemPropertyResource;
 
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -1211,12 +1212,28 @@ public class DiContainerTest {
                     is("file to import not found. path=[classpath:fileNotFound.xml]"));
         }
     }
-
+    
     /**
      * xml内に書かれたサロゲートペアが扱えることを検証するケース
      */
     @Test
     public void testSurrogatePair() {
+        Assume.assumeThat(System.getProperty("java.specification.version"), allOf(not("1.6"), not("1.7")));
+        
+        XmlComponentDefinitionLoader loader = new XmlComponentDefinitionLoader(
+                "nablarch/core/repository/di/DiContainerTest/testSurrogatePair.xml");
+        final DiContainer sut = new DiContainer(loader);
+
+        final SurrogatePair case2 = sut.getComponentByName("component");
+        assertThat(case2.getValue(), is("🍣🍣🍣!!!"));
+    }
+
+
+    /**
+     * configファイルを参照した場合(place holder)を使用した場合サロゲートペアが扱えることを検証するケース
+     */
+    @Test
+    public void testSurrogatePair_usePlaceHolder() {
         XmlComponentDefinitionLoader loader = new XmlComponentDefinitionLoader(
                 "nablarch/core/repository/di/DiContainerTest/testSurrogatePair.xml");
         final DiContainer sut = new DiContainer(loader);
