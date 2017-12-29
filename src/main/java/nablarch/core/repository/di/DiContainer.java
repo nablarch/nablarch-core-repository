@@ -25,6 +25,10 @@ import nablarch.core.util.annotation.Published;
 /**
  * DIコンテナの機能を実現するクラス。
  *
+ * デフォルトでは、staticプロパティへのインジェクションは行われない。
+ * staticプロパティへのインジェクションを許可したい場合は、システムプロパティ
+ * {@literal "nablarch.diContainer.allowStaticInjection"}に{@code true}を設定すること。
+ *
  * @author Koichi Asano
  *
  */
@@ -35,6 +39,9 @@ public class DiContainer implements ObjectLoader {
      * ロガー。
      */
     private static final Logger LOGGER = LoggerManager.get(DiContainer.class);
+
+    /** staticプロパティへのインジェクションを許容する場合のシステムプロパティ名 */
+    static final String ALLOW_STATIC_INJECTION_SYSTEM_PROP_NAME = "nablarch.diContainer.allowStaticInjection";
 
     /**
      * idをキーにコンポーネントホルダを取得するMap。
@@ -59,13 +66,26 @@ public class DiContainer implements ObjectLoader {
      */
     private ReferenceStack refStack = new ReferenceStack();
 
+    /** staticプロパティへのインジェクションを許容するかどうか。 */
+    private final boolean allowStaticInjection;
+
     /**
      * コンストラクタ。
      * @param loader コンポーネント定義のローダ
      */
     public DiContainer(ComponentDefinitionLoader loader) {
+        this(loader, Boolean.getBoolean(ALLOW_STATIC_INJECTION_SYSTEM_PROP_NAME));
+    }
+
+    /**
+     * コンストラクタ。
+     * @param loader コンポーネント定義のローダ
+     * @param allowStaticInjection staticプロパティへのインジェクションを許容するかどうか
+     */
+    public DiContainer(ComponentDefinitionLoader loader, boolean allowStaticInjection) {
         super();
         this.loader = loader;
+        this.allowStaticInjection = allowStaticInjection;
         reload();
     }
 
@@ -456,7 +476,7 @@ public class DiContainer implements ObjectLoader {
         if (value != null) {
             final String propertyName = ref.getPropertyName();
             writeIgnorePropertyLog(component.getClass(), propertyName);
-            ObjectUtil.setProperty(component, ref.getPropertyName(), value);
+            ObjectUtil.setProperty(component, ref.getPropertyName(), value, allowStaticInjection);
         }
     }
 
