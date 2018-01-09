@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import nablarch.core.exception.IllegalConfigurationException;
 import nablarch.core.log.Logger;
 import nablarch.core.log.LoggerManager;
 import nablarch.core.repository.IgnoreProperty;
@@ -492,7 +493,7 @@ public class DiContainer implements ObjectLoader {
         writeIgnorePropertyLog(component.getClass(), propertyName);
         try {
             ObjectUtil.setProperty(component, propertyName, value, allowStaticInjection);
-        } catch (IllegalStateException e) {
+        } catch (IllegalConfigurationException e) {
             throw new ContainerProcessException(
                     "static property injection not allowed. " +
                             "component=[" + holder.getDefinition().getName() + "] " +

@@ -17,6 +17,8 @@ import static org.junit.Assert.assertThat;
 public class StaticInjectionTest {
 
     private static final String PKG = "nablarch/core/repository/di/staticprop/";
+
+    /** システムプロパティを変更するテストケースがあるので元に戻す設定を入れる */
     @Rule
     public SystemPropertyResource sysProps = new SystemPropertyResource();
 
@@ -83,7 +85,7 @@ public class StaticInjectionTest {
 
     @Test
     public void SystemProperty経由でstaticインジェクションを許可できること() {
-        System.setProperty(DiContainer.ALLOW_STATIC_INJECTION_SYSTEM_PROP_NAME, "true");
+        System.setProperty(DiContainer.ALLOW_STATIC_INJECTION_SYSTEM_PROP_NAME, "true");  // @Rule SystemPropertyResourceで元に戻す
         sut = new DiContainer(new XmlComponentDefinitionLoader(PKG + "static-property-injection-autowire.xml"));
         SystemRepository.load(sut);
         Bar bar = SystemRepository.get("bar");
