@@ -8,10 +8,9 @@ import nablarch.core.repository.test.SystemPropertyResource;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 
@@ -20,6 +19,9 @@ public class StaticInjectionTest {
     private static final String PKG = "nablarch/core/repository/di/staticprop/";
     @Rule
     public SystemPropertyResource sysProps = new SystemPropertyResource();
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     /** テスト対象 */
     private DiContainer sut;
@@ -41,12 +43,12 @@ public class StaticInjectionTest {
     }
 
     @Test
-    public void staticインジェクションを許容しない場合_staticなプロパティにはインジェクションされないこと() {
+    public void staticインジェクションを許容しない場合_staticなプロパティにはインジェクションされず例外が発生すること() {
+        expectedException.expect(ContainerProcessException.class);
+        expectedException.expectMessage("static property injection not allowed. " +
+                                                "component=[foo] property=[bar]");
         sut = new DiContainer(new XmlComponentDefinitionLoader(PKG + "static-property-injection-autowire.xml"),
                               false);
-        Bar barOfFoo = Foo.getBar();
-        assertThat("コンポーネントfooのstaticプロパティにインジェクションがされていないこと",
-                   barOfFoo, is(nullValue()));
     }
 
     @Test
@@ -60,23 +62,23 @@ public class StaticInjectionTest {
     }
 
     @Test
-    public void AutoWireでない場合_デフォルトではstaticプロパティにはインジェクションされないこと() {
-
+    public void AutoWireでない場合_デフォルトではstaticプロパティにはインジェクションされず例外が発生すること() {
+        expectedException.expect(ContainerProcessException.class);
+        expectedException.expectMessage("static property injection not allowed. " +
+                                                "component=[foo] property=[bar]");
         sut = new DiContainer(new XmlComponentDefinitionLoader(PKG + "static-property-injection-non-autowire.xml"),
                               false);
-        Bar barOfFoo = Foo.getBar();
-        assertThat(barOfFoo, is(nullValue()));
     }
 
     @Test
-    public void SystemPropertyに許可設定がない場合_staticなプロパティにはインジェクションされないこと() {
+    public void SystemPropertyに許可設定がない場合_staticなプロパティにはインジェクションされず例外が発生すること() {
         System.clearProperty(DiContainer.ALLOW_STATIC_INJECTION_SYSTEM_PROP_NAME);
+
+        expectedException.expect(ContainerProcessException.class);
+        expectedException.expectMessage("static property injection not allowed. " +
+                                                "component=[foo] property=[bar]");
+
         sut = new DiContainer(new XmlComponentDefinitionLoader(PKG + "static-property-injection-autowire.xml"));
-        SystemRepository.load(sut);
-        Foo foo = SystemRepository.get("foo");
-        assertThat(foo, is(not(nullValue())));
-        Bar barOfFoo = Foo.getBar();
-        assertThat(barOfFoo, is(nullValue()));
     }
 
     @Test

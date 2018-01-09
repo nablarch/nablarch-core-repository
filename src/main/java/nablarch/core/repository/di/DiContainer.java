@@ -432,11 +432,11 @@ public class DiContainer implements ObjectLoader {
      * @param holder 初期化するコンポーネントホルダ
      */
     private void initializeComponent(ComponentHolder holder) {
-        Object component = holder.getComponent();
+
         if (holder.getDefinition().getInjector() == null) {
             // Initializerがnullの場合、普通に初期化
             for (ComponentReference ref : holder.getDefinition().getReferences()) {
-                injectObject(component, ref);
+                injectObject(holder, ref);
             }
         } else {
             // Initializerがnullではない場合、インジェクト処理を委譲
@@ -447,10 +447,10 @@ public class DiContainer implements ObjectLoader {
 
     /**
      * 1つのプロパティのインジェクションを実行する。
-     * @param component コンポーネント
+     * @param holder 初期化するコンポーネントホルダ
      * @param ref 参照の定義
      */
-    private void injectObject(Object component, ComponentReference ref) {
+    private void injectObject(ComponentHolder holder, ComponentReference ref) {
         Object value;
         if (ref.getInjectionType() == InjectionType.ID) {
             value = getComponentById(ref.getTargetId());
@@ -474,9 +474,20 @@ public class DiContainer implements ObjectLoader {
             value = getComponentByName(ref.getReferenceName());
         }
         if (value != null) {
-            final String propertyName = ref.getPropertyName();
-            writeIgnorePropertyLog(component.getClass(), propertyName);
-            ObjectUtil.setProperty(component, ref.getPropertyName(), value, allowStaticInjection);
+            setProperty(holder, ref.getPropertyName(), value);
+        }
+    }
+
+    private void setProperty(ComponentHolder holder, String propertyName, Object value) {
+        Object component = holder.getComponent();
+        writeIgnorePropertyLog(component.getClass(), propertyName);
+        try {
+            ObjectUtil.setProperty(component, propertyName, value, allowStaticInjection);
+        } catch (IllegalStateException e) {
+            throw new ContainerProcessException(
+                    "static property injection not allowed. " +
+                            "component=[" + holder.getDefinition().getName() + "] " +
+                            "property=[" + propertyName + "]");
         }
     }
 
