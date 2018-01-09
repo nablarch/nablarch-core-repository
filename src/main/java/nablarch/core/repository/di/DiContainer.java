@@ -26,6 +26,7 @@ import nablarch.core.util.annotation.Published;
  * DIコンテナの機能を実現するクラス。
  *
  * デフォルトでは、staticプロパティへのインジェクションは行われない。
+ * インジェクションの対象となるプロパティがstaticである場合、例外が発生する。
  * staticプロパティへのインジェクションを許可したい場合は、システムプロパティ
  * {@literal "nablarch.diContainer.allowStaticInjection"}に{@code true}を設定すること。
  *
@@ -478,6 +479,13 @@ public class DiContainer implements ObjectLoader {
         }
     }
 
+    /**
+     * コンポーネントのプロパティに値を設定する。
+     *
+     * @param holder コンポーネントホルダ
+     * @param ref 参照の定義
+     * @param value 値
+     */
     private void setProperty(ComponentHolder holder, ComponentReference ref, Object value) {
         Object component = holder.getComponent();
         String propertyName = ref.getPropertyName();
