@@ -474,12 +474,13 @@ public class DiContainer implements ObjectLoader {
             value = getComponentByName(ref.getReferenceName());
         }
         if (value != null) {
-            setProperty(holder, ref.getPropertyName(), value);
+            setProperty(holder, ref, value);
         }
     }
 
-    private void setProperty(ComponentHolder holder, String propertyName, Object value) {
+    private void setProperty(ComponentHolder holder, ComponentReference ref, Object value) {
         Object component = holder.getComponent();
+        String propertyName = ref.getPropertyName();
         writeIgnorePropertyLog(component.getClass(), propertyName);
         try {
             ObjectUtil.setProperty(component, propertyName, value, allowStaticInjection);
