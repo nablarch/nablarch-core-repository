@@ -1,5 +1,6 @@
 package nablarch.core.repository.di;
 
+import nablarch.core.exception.IllegalConfigurationException;
 import nablarch.core.repository.SystemRepository;
 import nablarch.core.repository.di.config.xml.XmlComponentDefinitionLoader;
 import nablarch.core.repository.di.staticprop.Bar;
@@ -11,6 +12,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.isA;
 import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.junit.Assert.assertThat;
 
@@ -49,6 +51,7 @@ public class StaticInjectionTest {
         expectedException.expect(ContainerProcessException.class);
         expectedException.expectMessage("static property injection not allowed. " +
                                                 "component=[foo] property=[bar]");
+        expectedException.expectCause(isA(IllegalConfigurationException.class));
         sut = new DiContainer(new XmlComponentDefinitionLoader(PKG + "static-property-injection-autowire.xml"),
                               false);
     }
@@ -68,6 +71,7 @@ public class StaticInjectionTest {
         expectedException.expect(ContainerProcessException.class);
         expectedException.expectMessage("static property injection not allowed. " +
                                                 "component=[foo] property=[bar]");
+        expectedException.expectCause(isA(IllegalConfigurationException.class));
         sut = new DiContainer(new XmlComponentDefinitionLoader(PKG + "static-property-injection-non-autowire.xml"),
                               false);
     }

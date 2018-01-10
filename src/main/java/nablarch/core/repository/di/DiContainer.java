@@ -499,7 +499,7 @@ public class DiContainer implements ObjectLoader {
             throw new ContainerProcessException(
                     "static property injection not allowed. " +
                             "component=[" + holder.getDefinition().getName() + "] " +
-                            "property=[" + propertyName + "]");
+                            "property=[" + propertyName + "]", e);
         }
     }
 
