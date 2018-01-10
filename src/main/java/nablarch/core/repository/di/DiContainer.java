@@ -26,10 +26,12 @@ import nablarch.core.util.annotation.Published;
 /**
  * DIコンテナの機能を実現するクラス。
  *
- * デフォルトでは、staticプロパティへのインジェクションは行われない。
+ * staticプロパティへのインジェクションは行われない。
  * インジェクションの対象となるプロパティがstaticである場合、例外が発生する。
- * staticプロパティへのインジェクションを許可したい場合は、システムプロパティ
- * {@literal "nablarch.diContainer.allowStaticInjection"}に{@code true}を設定すること。
+ *
+ * 後方互換性を維持するするため、システムプロパティ{@literal "nablarch.diContainer.allowStaticInjection"}に
+ * {@code true}を設定することで、staticプロパティへのインジェクションを許可できる。
+ * 後方互換性維持以外の目的での使用は推奨しない。
  *
  * @author Koichi Asano
  *
