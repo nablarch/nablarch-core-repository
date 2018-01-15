@@ -82,21 +82,6 @@ public class PropertiesFileLoader implements ObjectLoader {
     private static final Logger LOGGER = LoggerManager.get(PropertiesFileLoader.class);
 
     /**
-     * エスケープ文字＆行連結文字。
-     */
-    private static final char ESC_CHAR = '\\';
-
-    /**
-     * デリミタ文字。
-     */
-    private static final char DELIMITER_CHAR = '=';
-
-    /**
-     * コメント文字。
-     */
-    private static final char COMMENT_CHAR = '#'; // コメント文字
-
-    /**
      * 設定ファイルのデフォルトエンコーディング。
      */
     private static final String DEFAULT_PROPERTIES_FILE_ENCODING = "UTF-8";
@@ -114,7 +99,6 @@ public class PropertiesFileLoader implements ObjectLoader {
      * 入力ストリームのエンコーディング。
      */
     private String encoding;
-
 
     /**
      * コンストラクタ。
@@ -145,17 +129,6 @@ public class PropertiesFileLoader implements ObjectLoader {
     }
 
     /**
-     * コンストラクタ。
-     *
-     * @param stream ロードするファイルのストリーム。
-     * @param encoding ファイルのエンコーディング。
-     */
-    public PropertiesFileLoader(InputStream stream, String encoding) {
-        this.inStream = stream;
-        this.encoding = encoding;
-    }
-
-    /**
      * {@inheritDoc} <br/>
      *
      * PropertiesFileLoaderでは、プロパティファイルに書かれたキーと値の組合せを
@@ -177,10 +150,9 @@ public class PropertiesFileLoader implements ObjectLoader {
                     LOGGER.logTrace(" properties file opened. "
                             + " url = " + url + "");
                 }
-            }
-
-            if (inStream == null) {
-                inStream = FileUtil.getResource(url);
+                if (inStream == null) {
+                    inStream = FileUtil.getResource(url);
+                }
             }
 
             String propertiesFileEncoding;
