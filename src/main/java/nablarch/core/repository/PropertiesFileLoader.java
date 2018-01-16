@@ -9,7 +9,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -17,61 +16,9 @@ import java.util.Properties;
 
 /**
  * 設定ファイルから文字列の設定値を読み込むクラス。
- * 
- * このクラスで使用する特殊文字は '=' '#' '\' の3文字（下記参照）。
- * <dl>
- *         <dt>デリミタ文字（'='）
- *             <dd>デリミタ文字は'='のみで、空白（タブを含む）や":"も文字列の一部とみなす。
- *                 (いわゆるpropertiesファイルとは異なる。）
- *                 但し、キー及び値はそれぞれ前後の空白（タブを含む）をトリミングする。
- *                 (" A B "(スペースAスペースBスペース)という文字列は
- *                 "A B"(AスペースB)となる。キーの'A'と'a'は区別される。)
- *                 デリミタ文字'='で区切られた３つめ以降のトークンは無視する。
- *                 <br>'='をキーまたは値に含めたい場合は前に'\'を付加する。
- *         <dt>コメント文字（'#'）
- *             <dd>コメント文字'#'を使用するとその行の以降の文字列はコメントとみなす。
- *                 '#'によるコメントを除去する処理は行連結の前に行われるので、
- *                 継続行中でも使用可能（下記「使用例」参照）。
- *                 <br>'#'をキーまたは値に含めたい場合は前に'\'を付加する。
- *         <dt>改行文字（'\'）
- *             <dd>キーと値のセットは行末に'\'を指定することによって行をまたがることが可能。
- *                 その場合'\'を除いた文字列と次の行の先頭の空白（タブを含む）を除いた
- *                 文字列を連結する。（'\'を除いた文字列の後方の空白は維持する。）
- *                 <br>キーまたは値の行末に'\'を含めたい場合は前に'\'を付加する。
- *         <dt>エスケープ文字（'\'）
- *             <dd>'\'を記述すると次の１文字を特殊文字ではなく一般文字として扱う。
- *                 <br>'\'をキーまたは値に含めたい場合は前に'\'を付加する。
- * </dl>
- * 読み込むファイルの記述例：<br><pre>
- *  # キー＝"key"、値＝"value"の場合
- *  key = value # comment
- *  key = value = comment
  *
- *  # キー＝"key"、値＝"value1 = value2"の場合
- *  key = value1 \= value2  #comment
- *  key = \
- *      value1 \= value2
+ * propertiesファイルをjava.util.Propertiesを使ってloadするクラス。
  *
- *  # キー＝"key"、値＝"value1,value2,value3"の場合
- *  key =   value1,value2,value3    # comment
- *  key =   value1,\
- *          value2,\
- *          value3 # comment
- *  key =   value1,\    # comment
- *          value2,\    # comment
- *          value3      # comment
- * 
- *  # 下記はNG。
- *  key =   value1,     # comment \
- *          value2,     # comment \
- *          value3      # comment
- * </PRE>
- * <p/>
- * なお、本クラスはデフォルトでは設定ファイルをUTF-8エンコーディングで読み込む。
- * エンコーディングを変更する場合は、ConfigFileクラスのencodingプロパティにエンコーディングを設定してから load() メソッドを呼び出すこと。
- * 
- * @author Koichi Asano 
- * @see nablarch.core.repository.di.config.xml.schema.ConfigFile
  */
 @Published(tag = "architect")
 public class PropertiesFileLoader implements ObjectLoader {
@@ -98,7 +45,7 @@ public class PropertiesFileLoader implements ObjectLoader {
     /**
      * 入力ストリームのエンコーディング。
      */
-    private String encoding;
+    final String encoding;
 
     /**
      * コンストラクタ。
@@ -120,59 +67,48 @@ public class PropertiesFileLoader implements ObjectLoader {
     }
 
     /**
-     * コンストラクタ。
-     *
-     * @param stream ロードするファイルのストリーム。
-     */
-    public PropertiesFileLoader(InputStream stream) {
-        this.inStream = stream;
-    }
-
-    /**
      * {@inheritDoc} <br/>
      *
      * PropertiesFileLoaderでは、プロパティファイルに書かれたキーと値の組合せを
-     * そのままMapを返す。
-     * このため、値は常に文字列となる。
+     * Propertiesでloadしてkey&valueの文字列としてMapに格納して返す。
      */
+    @Override
     public Map<String, Object> load() {
         Map<String, Object> values = new HashMap<String, Object>();
-        Properties prop = new Properties();
-        BufferedReader reader = null;
 
         if (LOGGER.isDebugEnabled()) {
             LOGGER.logDebug("load environment properties file."
                     + " file = " + url);
         }
-        try {
-            if (url != null) {
-                if (LOGGER.isTraceEnabled()) {
-                    LOGGER.logTrace(" properties file opened. "
-                            + " url = " + url + "");
-                }
-                if (inStream == null) {
-                    inStream = FileUtil.getResource(url);
-                }
+        if (url != null) {
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.logTrace(" properties file opened. "
+                        + " url = " + url + "");
             }
+            if (inStream == null) {
+                inStream = FileUtil.getResource(url);
+            }
+        }
 
-            String propertiesFileEncoding;
-            if (this.encoding != null) {
-                propertiesFileEncoding = this.encoding;
-            } else {
-                propertiesFileEncoding = DEFAULT_PROPERTIES_FILE_ENCODING;
-            }
+        String propertiesFileEncoding;
+        if (this.encoding != null) {
+            propertiesFileEncoding = this.encoding;
+        } else {
+            propertiesFileEncoding = DEFAULT_PROPERTIES_FILE_ENCODING;
+        }
+
+        BufferedReader reader = null;
+        try {
 
             reader = new BufferedReader(new InputStreamReader(inStream,
                     propertiesFileEncoding));
 
+            Properties prop = new Properties();
             prop.load(reader);
             for (Entry<Object, Object> e : prop.entrySet()) {
                 values.put((String) e.getKey(),e.getValue());
             }
 
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(
-                    "properties file read failed.", e);
         } catch (IOException e) {
             // readFile のエラーなので、到達不能です。
             throw new RuntimeException(
@@ -182,8 +118,7 @@ public class PropertiesFileLoader implements ObjectLoader {
 
             if (url != null) {
                 if (LOGGER.isTraceEnabled()) {
-                    LOGGER.logTrace(" properties file closed. "
-                            + " url = " + url + "");
+                    LOGGER.logTrace(" properties file closed. ");
                 }
             }
         }

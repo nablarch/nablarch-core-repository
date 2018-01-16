@@ -13,7 +13,11 @@ import java.io.InputStream;
 import java.util.Map;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.collection.IsMapContaining.hasKey;
+
 import static org.junit.Assert.*;
+import org.junit.rules.TemporaryFolder;
 
 public class PropertiesFileLoaderTest {
 
@@ -30,12 +34,12 @@ public class PropertiesFileLoaderTest {
         assertThat(valueMap.get("key2"), CoreMatchers.<Object>is("value2"));
     }
 
+    @Rule
+    public TemporaryFolder temp = new TemporaryFolder();
+
     @Test
-    public void testPropertiesFileLoaderStringString() throws Throwable {
-        File sjisFile = File.createTempFile("PropertiesFileLoaderTest", ".properties");
-        sjisFile.deleteOnExit();
-        File utf8File = File.createTempFile("PropertiesFileLoaderTest", ".properties");
-        utf8File.deleteOnExit();
+    public void testPropertiesFileLoaderStringEncodingMs932() throws Throwable {
+        File sjisFile = temp.newFile("PropertiesFileLoaderTest.properties");
 
         FileOutputStream sjisOut = null;
         try {
@@ -45,6 +49,18 @@ public class PropertiesFileLoaderTest {
             sjisOut.close();
         }
 
+        PropertiesFileLoader sjisLoader = new PropertiesFileLoader(sjisFile.toURI()
+                                                                   .toString(), "MS932");
+        Map<String, Object> sjisValues = sjisLoader.load();
+
+        assertEquals("値1", sjisValues.get("key1"));
+        assertEquals("値2", sjisValues.get("key2"));
+    }
+
+    @Test
+    public void testPropertiesFileLoaderStringEncodingUtf8() throws Throwable {
+        File utf8File = temp.newFile("PropertiesFileLoaderTest.properties");
+
         FileOutputStream utf8Out = null;
         try {
             utf8Out = new FileOutputStream(utf8File);
@@ -53,37 +69,12 @@ public class PropertiesFileLoaderTest {
             utf8Out.close();
         }
 
-        PropertiesFileLoader sjisLoader = new PropertiesFileLoader(sjisFile.toURI()
-                                                                   .toString(), "MS932");
-        Map<String, Object> sjisValues = sjisLoader.load();
         PropertiesFileLoader utf8Loader = new PropertiesFileLoader(utf8File.toURI()
-                                                                   .toString(), "UTF-8");
+                .toString(), "UTF-8");
         Map<String, Object> utf8Values = utf8Loader.load();
 
-
-        sjisFile.delete();
-        utf8File.delete();
-
-        assertEquals("値1", sjisValues.get("key1"));
-        assertEquals("値2", sjisValues.get("key2"));
         assertEquals("値1", utf8Values.get("key1"));
         assertEquals("値2", utf8Values.get("key2"));
-    }
-
-
-    @Test
-    public void testPropertiesFileLoaderStream() throws Throwable {
-
-        final InputStream resource = FileUtil.getResource(createPropertiesFileName());
-        PropertiesFileLoader loader;
-        try {
-            loader = new PropertiesFileLoader(resource);
-            Map<String, Object> valueMap = loader.load();
-            assertThat(valueMap.get("key1"), CoreMatchers.<Object>is("value1"));
-            assertThat(valueMap.get("key2"), CoreMatchers.<Object>is("value2"));
-        } finally {
-            resource.close();
-        }
     }
 
     @Test
@@ -112,19 +103,14 @@ public class PropertiesFileLoaderTest {
         assertThat(valueMap.get("key5"), CoreMatchers.<Object>is("value5"));
         assertThat(valueMap.get("key6"), CoreMatchers.<Object>is("test test#Propertiesでは解釈される"));
         assertThat(valueMap.get("key7"), CoreMatchers.<Object>is("test #test"));
-        assertThat(valueMap.get("key8"), CoreMatchers.<Object>is(" "));
         assertThat(valueMap.containsKey("novalue"), is(true));
 
-        for (String key : valueMap.keySet()) {
-            if (key.contains("comment_key")) {
-                fail("コメント行の中身が解釈されている");
-            }
-        }
+        assertThat(valueMap, is(not(hasKey("comment_key"))));
     }
 
     @Test
     public void testPropertiesFileLoaderFail() throws Throwable {
-        PropertiesFileLoader loader = new PropertiesFileLoader(createPropertiesFileName(), "unkown encoding");
+        PropertiesFileLoader loader = new PropertiesFileLoader(createPropertiesFileName(), "unknown encoding");
         try {
             loader.load();
             fail("例外が発生するはず");

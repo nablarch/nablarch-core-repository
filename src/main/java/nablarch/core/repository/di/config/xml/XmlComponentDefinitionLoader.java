@@ -421,8 +421,7 @@ public class XmlComponentDefinitionLoader implements ComponentDefinitionLoader {
     private ComponentDefinition createConfigFileLoaderDefinition(
             DiContainer container, String pathname, String encoding) {
         ObjectLoader loader;
-        String type = pathname.substring(pathname.length()-10,pathname.length());
-        if(type.equals("properties")){
+        if(pathname.endsWith(".properties")){
             loader = new PropertiesFileLoader(pathname, encoding);
         }else{
             loader = new ConfigFileLoader(pathname, encoding);
