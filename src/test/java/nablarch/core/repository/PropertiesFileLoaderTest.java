@@ -1,6 +1,5 @@
 package nablarch.core.repository;
 
-import nablarch.core.util.FileUtil;
 import org.hamcrest.CoreMatchers;
 import org.hamcrest.Matchers;
 import org.junit.Rule;
@@ -9,17 +8,15 @@ import org.junit.rules.TestName;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.util.Map;
-
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.collection.IsMapContaining.hasKey;
 
 import static org.junit.Assert.*;
 import org.junit.rules.TemporaryFolder;
 
 public class PropertiesFileLoaderTest {
+
+    @Rule
+    public TemporaryFolder temp = new TemporaryFolder();
 
     @Rule
     public TestName testName = new TestName();
@@ -33,9 +30,6 @@ public class PropertiesFileLoaderTest {
         assertThat(valueMap.get("key1\\"), CoreMatchers.<Object>is("value1\\"));
         assertThat(valueMap.get("key2"), CoreMatchers.<Object>is("value2"));
     }
-
-    @Rule
-    public TemporaryFolder temp = new TemporaryFolder();
 
     @Test
     public void testPropertiesFileLoaderStringEncodingMs932() throws Throwable {
@@ -88,24 +82,6 @@ public class PropertiesFileLoaderTest {
                         .get("key1"), CoreMatchers.<Object>is("値1"));
         assertThat(utf8.load()
                        .get("key1"), CoreMatchers.<Object>is("値1"));
-    }
-
-    @Test
-    public void testPropertiesFileLoaderFileGrammar() throws Throwable {
-
-        PropertiesFileLoader loader = new PropertiesFileLoader(createPropertiesFileName());
-        Map<String, Object> valueMap = loader.load();
-
-        assertThat(valueMap.get("key1"), CoreMatchers.<Object>is("value1 test"));
-        assertThat(valueMap.get("key2"), CoreMatchers.<Object>is("value2-2"));
-        assertThat(valueMap.get("key3"), CoreMatchers.<Object>is("value3\\test"));
-        assertThat(valueMap.get("key4"), CoreMatchers.<Object>is("value4=test"));
-        assertThat(valueMap.get("key5"), CoreMatchers.<Object>is("value5"));
-        assertThat(valueMap.get("key6"), CoreMatchers.<Object>is("test test#Propertiesでは解釈される"));
-        assertThat(valueMap.get("key7"), CoreMatchers.<Object>is("test #test"));
-        assertThat(valueMap.containsKey("novalue"), is(true));
-
-        assertThat(valueMap, is(not(hasKey("comment_key"))));
     }
 
     @Test

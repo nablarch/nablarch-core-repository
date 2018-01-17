@@ -5,6 +5,7 @@ import nablarch.core.log.LoggerManager;
 import nablarch.core.util.FileUtil;
 import nablarch.core.util.annotation.Published;
 
+import java.io.Reader;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,8 +18,10 @@ import java.util.Properties;
 /**
  * 設定ファイルから文字列の設定値を読み込むクラス。
  *
- * propertiesファイルをjava.util.Propertiesを使ってloadするクラス。
+ * propertiesファイルを{@link Properties}を使ってloadするクラス。
  *
+ * @author Takao Inaba
+ * @see java.util.Properties#load(Reader)
  */
 @Published(tag = "architect")
 public class PropertiesFileLoader implements ObjectLoader {
@@ -37,15 +40,11 @@ public class PropertiesFileLoader implements ObjectLoader {
      * 入力ファイル。
      */
     private String url;
-    /**
-     * 入力ストリーム。
-     */
-    private InputStream inStream;
 
     /**
      * 入力ストリームのエンコーディング。
      */
-    final String encoding;
+    private final String encoding;
 
     /**
      * コンストラクタ。
@@ -69,25 +68,23 @@ public class PropertiesFileLoader implements ObjectLoader {
     /**
      * {@inheritDoc} <br/>
      *
-     * PropertiesFileLoaderでは、プロパティファイルに書かれたキーと値の組合せを
-     * Propertiesでloadしてkey&valueの文字列としてMapに格納して返す。
+     * {@link java.util.Properties}からロードしたkeyとvalueをMapに格納して返す。
+     * @return プロパティのkeyとvalueを文字列として格納したMap
      */
     @Override
     public Map<String, Object> load() {
-        Map<String, Object> values = new HashMap<String, Object>();
 
         if (LOGGER.isDebugEnabled()) {
             LOGGER.logDebug("load environment properties file."
                     + " file = " + url);
         }
+        InputStream inStream = null;
         if (url != null) {
             if (LOGGER.isTraceEnabled()) {
                 LOGGER.logTrace(" properties file opened. "
                         + " url = " + url + "");
             }
-            if (inStream == null) {
-                inStream = FileUtil.getResource(url);
-            }
+            inStream = FileUtil.getResource(url);
         }
 
         String propertiesFileEncoding;
@@ -97,6 +94,7 @@ public class PropertiesFileLoader implements ObjectLoader {
             propertiesFileEncoding = DEFAULT_PROPERTIES_FILE_ENCODING;
         }
 
+        Map<String, Object> values = new HashMap<String, Object>();
         BufferedReader reader = null;
         try {
 
@@ -110,7 +108,6 @@ public class PropertiesFileLoader implements ObjectLoader {
             }
 
         } catch (IOException e) {
-            // readFile のエラーなので、到達不能です。
             throw new RuntimeException(
                     "properties file read failed.", e);
         } finally {
@@ -118,7 +115,8 @@ public class PropertiesFileLoader implements ObjectLoader {
 
             if (url != null) {
                 if (LOGGER.isTraceEnabled()) {
-                    LOGGER.logTrace(" properties file closed. ");
+                    LOGGER.logTrace(" properties file closed. "
+                            + " url = " + url);
                 }
             }
         }
