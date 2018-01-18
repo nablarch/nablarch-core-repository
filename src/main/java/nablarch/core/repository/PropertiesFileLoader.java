@@ -5,7 +5,6 @@ import nablarch.core.log.LoggerManager;
 import nablarch.core.util.FileUtil;
 import nablarch.core.util.annotation.Published;
 
-import java.io.Reader;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,7 +20,7 @@ import java.util.Properties;
  * propertiesファイルを{@link Properties}を使ってloadするクラス。
  *
  * @author Takao Inaba
- * @see java.util.Properties#load(Reader)
+ * @see java.util.Properties
  */
 @Published(tag = "architect")
 public class PropertiesFileLoader implements ObjectLoader {
@@ -39,7 +38,7 @@ public class PropertiesFileLoader implements ObjectLoader {
     /**
      * 入力ファイル。
      */
-    private String url;
+    private final String url;
 
     /**
      * 入力ストリームのエンコーディング。
@@ -82,9 +81,12 @@ public class PropertiesFileLoader implements ObjectLoader {
         if (url != null) {
             if (LOGGER.isTraceEnabled()) {
                 LOGGER.logTrace(" properties file opened. "
-                        + " url = " + url + "");
+                        + " url = " + url);
             }
             inStream = FileUtil.getResource(url);
+        } else {
+            throw new RuntimeException("url is required. "
+                    + " url = null");
         }
 
         String propertiesFileEncoding;
@@ -97,7 +99,6 @@ public class PropertiesFileLoader implements ObjectLoader {
         Map<String, Object> values = new HashMap<String, Object>();
         BufferedReader reader = null;
         try {
-
             reader = new BufferedReader(new InputStreamReader(inStream,
                     propertiesFileEncoding));
 

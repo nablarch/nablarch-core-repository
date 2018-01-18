@@ -95,6 +95,17 @@ public class PropertiesFileLoaderTest {
         }
     }
 
+    @Test
+    public void testPropertiesFileLoaderUrlNull() throws Throwable {
+        PropertiesFileLoader loader = new PropertiesFileLoader(null);
+        try {
+            loader.load();
+            fail("例外が発生するはず");
+        } catch (RuntimeException re) {
+            assertThat(re.getMessage(), CoreMatchers.containsString("url is required.  url = null"));
+        }
+    }
+
     /**
      * 存在しないファイルパスを指定。
      */
