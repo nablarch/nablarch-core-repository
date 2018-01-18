@@ -60,8 +60,13 @@ public class PropertiesFileLoader implements ObjectLoader {
      * @param encoding ファイルのエンコーディング。
      */
     public PropertiesFileLoader(String url, String encoding) {
-        this.url = url;
-        this.encoding = encoding;
+        if (url == null) {
+            throw new RuntimeException("url is required. "
+                    + " url = null");
+        } else {
+            this.url = url;
+            this.encoding = encoding;
+        }
     }
 
     /**
@@ -77,16 +82,9 @@ public class PropertiesFileLoader implements ObjectLoader {
             LOGGER.logDebug("load environment properties file."
                     + " file = " + url);
         }
-        InputStream inStream = null;
-        if (url != null) {
-            if (LOGGER.isTraceEnabled()) {
-                LOGGER.logTrace(" properties file opened. "
-                        + " url = " + url);
-            }
-            inStream = FileUtil.getResource(url);
-        } else {
-            throw new RuntimeException("url is required. "
-                    + " url = null");
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.logTrace(" properties file opened. "
+                    + " url = " + url);
         }
 
         String propertiesFileEncoding;
@@ -98,6 +96,7 @@ public class PropertiesFileLoader implements ObjectLoader {
 
         Map<String, Object> values = new HashMap<String, Object>();
         BufferedReader reader = null;
+        InputStream inStream = FileUtil.getResource(url);
         try {
             reader = new BufferedReader(new InputStreamReader(inStream,
                     propertiesFileEncoding));
@@ -114,11 +113,9 @@ public class PropertiesFileLoader implements ObjectLoader {
         } finally {
             FileUtil.closeQuietly(reader);
 
-            if (url != null) {
-                if (LOGGER.isTraceEnabled()) {
-                    LOGGER.logTrace(" properties file closed. "
-                            + " url = " + url);
-                }
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.logTrace(" properties file closed. "
+                        + " url = " + url);
             }
         }
 
