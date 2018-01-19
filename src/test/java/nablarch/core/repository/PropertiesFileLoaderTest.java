@@ -100,7 +100,7 @@ public class PropertiesFileLoaderTest {
         try {
             new PropertiesFileLoader(null);
             fail("例外が発生するはず");
-        } catch (RuntimeException re) {
+        } catch (IllegalArgumentException re) {
             assertThat(re.getMessage(), CoreMatchers.containsString("url is required.  url = null"));
         }
     }

@@ -61,12 +61,11 @@ public class PropertiesFileLoader implements ObjectLoader {
      */
     public PropertiesFileLoader(String url, String encoding) {
         if (url == null) {
-            throw new RuntimeException("url is required. "
+            throw new IllegalArgumentException("url is required. "
                     + " url = null");
-        } else {
-            this.url = url;
-            this.encoding = encoding;
         }
+        this.url = url;
+        this.encoding = encoding;
     }
 
     /**
