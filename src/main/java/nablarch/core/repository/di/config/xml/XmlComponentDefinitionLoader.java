@@ -23,6 +23,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import nablarch.core.log.Logger;
 import nablarch.core.log.LoggerManager;
 import nablarch.core.repository.ConfigFileLoader;
+import nablarch.core.repository.ObjectLoader;
+import nablarch.core.repository.PropertiesFileLoader;
 import nablarch.core.repository.di.ComponentCreator;
 import nablarch.core.repository.di.ComponentDefinition;
 import nablarch.core.repository.di.ComponentDefinitionLoader;
@@ -418,8 +420,12 @@ public class XmlComponentDefinitionLoader implements ComponentDefinitionLoader {
      */
     private ComponentDefinition createConfigFileLoaderDefinition(
             DiContainer container, String pathname, String encoding) {
-        ConfigFileLoader loader;
-        loader = new ConfigFileLoader(pathname, encoding);
+        ObjectLoader loader;
+        if (pathname.endsWith(".properties")) {
+            loader = new PropertiesFileLoader(pathname, encoding);
+        } else {
+            loader = new ConfigFileLoader(pathname, encoding);
+        }
         int id = container.generateId();
         ComponentCreator creator = new StoredValueComponentCreator(loader);
         ComponentDefinition def = new ComponentDefinition(id, null, creator, loader.getClass());

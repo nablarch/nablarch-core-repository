@@ -1,8 +1,7 @@
 package nablarch.core.repository.di;
 
 import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.*;
 
 import java.io.IOException;
 import java.net.URI;
@@ -543,6 +542,31 @@ public class DiContainerTest {
         assertThat(value1, is("value01")); // test01.propertiesの内容が読み込まれる
         assertThat(value2, is(nullValue())); // test02.propertiesの内容が読み込まれる
         assertThat(value3, is(nullValue())); // test03.xmlの内容は読み込まれない
+    }
+
+    /**
+     * config-file要素のdir属性のテスト。
+     * <p/>
+     * ディレクトリからconfigとPropertiesの両方の環境設定ファイルを読み込むことができることを確認。
+     */
+    @Test
+    public void testLoadPropertyFileFromCombinedUseDir() {
+
+        XmlComponentDefinitionLoader loader = new XmlComponentDefinitionLoader(
+                "nablarch/core/repository/di/DiContainerTest/loadPropertyFileFromDir/test3.xml");
+        DiContainer container = new DiContainer(loader);
+
+        String value1 = container.getComponentByName("key.file1");
+        String value2 = container.getComponentByName("key.file2");
+        String value3 = container.getComponentByName("key.file3");
+        String value4 = container.getComponentByName("key.file4");
+        String value5 = container.getComponentByName("key.file5");
+
+        assertThat(value1, is("value01")); // test01.propertiesの内容が読み込まれる
+        assertThat(value2, is("value02")); // test02.propertiesの内容が読み込まれる
+        assertThat(value3, is("value03")); // test03.configの内容が読み込まれる
+        assertNotEquals(value4,is(" "));// test04.configの内容が読み込まれ半角として扱えないこと
+        assertThat(value5, is(" ")); // test05.propertiesの内容が読み込まれ半角として扱えること
     }
 
     /**
