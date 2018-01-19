@@ -5,13 +5,14 @@ import org.hamcrest.Matchers;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TestName;
+import org.junit.rules.TemporaryFolder;
+import static org.junit.Assert.*;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Map;
 
-import static org.junit.Assert.*;
-import org.junit.rules.TemporaryFolder;
 
 public class PropertiesFileLoaderTest {
 
@@ -90,8 +91,8 @@ public class PropertiesFileLoaderTest {
         try {
             loader.load();
             fail("例外が発生するはず");
-        } catch (RuntimeException re) {
-            // OK
+        } catch (RuntimeException e) {
+            assertThat("IOExceptionが発生していること", e.getCause(), CoreMatchers.<Throwable>instanceOf(IOException.class));
         }
     }
 
@@ -100,8 +101,8 @@ public class PropertiesFileLoaderTest {
         try {
             new PropertiesFileLoader(null);
             fail("例外が発生するはず");
-        } catch (IllegalArgumentException re) {
-            assertThat(re.getMessage(), CoreMatchers.containsString("url is required.  url = null"));
+        } catch (IllegalArgumentException e) {
+            assertThat(e.getMessage(), CoreMatchers.containsString("url is required.  url = null"));
         }
     }
 

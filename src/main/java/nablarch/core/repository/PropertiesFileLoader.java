@@ -51,7 +51,7 @@ public class PropertiesFileLoader implements ObjectLoader {
      * @param url ロードするファイル。
      */
     public PropertiesFileLoader(String url) {
-        this(url, null);
+        this(url, DEFAULT_PROPERTIES_FILE_ENCODING);
     }
 
     /**
@@ -65,7 +65,7 @@ public class PropertiesFileLoader implements ObjectLoader {
                     + " url = null");
         }
         this.url = url;
-        this.encoding = encoding;
+        this.encoding = (encoding == null) ?DEFAULT_PROPERTIES_FILE_ENCODING :encoding;
     }
 
     /**
@@ -86,19 +86,12 @@ public class PropertiesFileLoader implements ObjectLoader {
                     + " url = " + url);
         }
 
-        String propertiesFileEncoding;
-        if (this.encoding != null) {
-            propertiesFileEncoding = this.encoding;
-        } else {
-            propertiesFileEncoding = DEFAULT_PROPERTIES_FILE_ENCODING;
-        }
-
         Map<String, Object> values = new HashMap<String, Object>();
         BufferedReader reader = null;
         InputStream inStream = FileUtil.getResource(url);
         try {
             reader = new BufferedReader(new InputStreamReader(inStream,
-                    propertiesFileEncoding));
+                    encoding));
 
             Properties prop = new Properties();
             prop.load(reader);
