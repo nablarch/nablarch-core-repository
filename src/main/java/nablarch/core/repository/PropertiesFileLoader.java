@@ -65,7 +65,7 @@ public class PropertiesFileLoader implements ObjectLoader {
                     + " url = null");
         }
         this.url = url;
-        this.encoding = (encoding == null) ?DEFAULT_PROPERTIES_FILE_ENCODING :encoding;
+        this.encoding = (encoding == null) ? DEFAULT_PROPERTIES_FILE_ENCODING : encoding;
     }
 
     /**
