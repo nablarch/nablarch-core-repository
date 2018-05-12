@@ -311,7 +311,7 @@ public class DiContainer implements ObjectLoader {
             nameIndex.put(def.getName(), holder);
         }
 
-        if (def.getClass() != null) {
+        if (def.getType() != null) {
             if (!def.isUseIdOnly()) {
                 registerTypes(def, holder);
             }
