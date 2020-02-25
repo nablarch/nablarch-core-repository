@@ -16,6 +16,8 @@ import nablarch.core.log.Logger;
 import nablarch.core.log.LoggerManager;
 import nablarch.core.repository.IgnoreProperty;
 import nablarch.core.repository.ObjectLoader;
+import nablarch.core.repository.di.config.externalize.ExternalizedComponentDefinitionLoader;
+import nablarch.core.repository.di.config.externalize.SystemPropertyExternalizedLoader;
 import nablarch.core.repository.initialization.ApplicationInitializer;
 import nablarch.core.util.Builder;
 import nablarch.core.util.ObjectUtil;
@@ -74,6 +76,11 @@ public class DiContainer implements ObjectLoader {
     private final boolean allowStaticInjection;
 
     /**
+     * 外部化されたコンポーネント定義を読み込むローダー。
+     */
+    private ExternalizedComponentDefinitionLoader externalizedComponentDefinitionLoader;
+
+    /**
      * コンストラクタ。
      * @param loader コンポーネント定義のローダ
      */
@@ -87,9 +94,20 @@ public class DiContainer implements ObjectLoader {
      * @param allowStaticInjection staticプロパティへのインジェクションを許容するかどうか
      */
     public DiContainer(ComponentDefinitionLoader loader, boolean allowStaticInjection) {
+        this(loader, allowStaticInjection, new SystemPropertyExternalizedLoader());
+    }
+
+    /**
+     * コンストラクタ。
+     * @param loader コンポーネント定義のローダ
+     * @param allowStaticInjection staticプロパティへのインジェクションを許容するかどうか
+     * @param externalizedComponentDefinitionLoader 外部化されたコンポーネント定義のローダー
+     */
+    public DiContainer(ComponentDefinitionLoader loader, boolean allowStaticInjection, ExternalizedComponentDefinitionLoader externalizedComponentDefinitionLoader) {
         super();
         this.loader = loader;
         this.allowStaticInjection = allowStaticInjection;
+        this.externalizedComponentDefinitionLoader = externalizedComponentDefinitionLoader;
         reload();
     }
 
@@ -177,36 +195,10 @@ public class DiContainer implements ObjectLoader {
             }
         }
 
-        // 定義を追加
-        for (Map.Entry<Object, Object> entry : System.getProperties().entrySet()) {
-            String key = (String) entry.getKey();
-            String value = (String) entry.getValue();
-
-            ComponentCreator creator = new StoredValueComponentCreator(value);
-            ComponentDefinition def = new ComponentDefinition(generateId(), key, creator, String.class);
-            
-            if (nameIndex.containsKey(key) && !(nameIndex.get(key).getDefinition().getCreator() instanceof StoredValueComponentCreator)) {
-                // StoredValueComponentCreator 以外のプロパティを StoredValueComponentCreator で上書きするのはおかしいので例外。
-                throw new RuntimeException("illegal system property was found which tries to override non-literal property." 
-                        + "system property can override literal value only."
-                        + " key = [" + def.getName() + "]"
-                        + " , previous class = [" + nameIndex.get(key).getDefinition().getType().getName() + "]");
-            }
-
-            if (nameIndex.containsKey(key)) {
-                ComponentHolder previous = nameIndex.get(key);
-                
-                // プロパティの上書きが発生
-                // システムプロパティでの上書きは通常運用で利用することがあるため、INFOレベルでログ出力する。
-                if (LOGGER.isInfoEnabled()) {
-                    LOGGER.logInfo("value was overridden by system property. " 
-                            + " key = " + def.getName() 
-                            + ", previous value = [" + previous.getDefinition().getCreator().createComponent(this, previous.getDefinition()) + "]"
-                            + ", new value = [" + value + "]");
-                }
-            }
-
-            register(def);
+        // 外部化されたコンポーネント定義で上書き
+        List<ComponentDefinition> externalized = externalizedComponentDefinitionLoader.load(this, nameIndex);
+        for (ComponentDefinition definition : externalized) {
+            register(definition);
         }
 
         // コンポーネント生成ループ
