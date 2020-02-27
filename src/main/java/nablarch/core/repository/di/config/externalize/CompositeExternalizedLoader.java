@@ -46,4 +46,12 @@ public class CompositeExternalizedLoader implements ExternalizedComponentDefinit
 
         return new ArrayList<ComponentDefinition>(result.values());
     }
+
+    /**
+     * このローダーが持つ{@link ExternalizedComponentDefinitionLoader}リストを取得する。
+     * @return このローダーが持つ{@link ExternalizedComponentDefinitionLoader}リスト
+     */
+    public List<ExternalizedComponentDefinitionLoader> getLoaders() {
+        return loaders;
+    }
 }

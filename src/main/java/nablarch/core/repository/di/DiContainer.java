@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -16,6 +17,7 @@ import nablarch.core.log.Logger;
 import nablarch.core.log.LoggerManager;
 import nablarch.core.repository.IgnoreProperty;
 import nablarch.core.repository.ObjectLoader;
+import nablarch.core.repository.di.config.externalize.CompositeExternalizedLoader;
 import nablarch.core.repository.di.config.externalize.ExternalizedComponentDefinitionLoader;
 import nablarch.core.repository.di.config.externalize.SystemPropertyExternalizedLoader;
 import nablarch.core.repository.initialization.ApplicationInitializer;
@@ -78,7 +80,7 @@ public class DiContainer implements ObjectLoader {
     /**
      * 外部化されたコンポーネント定義を読み込むローダー。
      */
-    private ExternalizedComponentDefinitionLoader externalizedComponentDefinitionLoader;
+    private final ExternalizedComponentDefinitionLoader externalizedComponentDefinitionLoader;
 
     /**
      * コンストラクタ。
@@ -94,21 +96,35 @@ public class DiContainer implements ObjectLoader {
      * @param allowStaticInjection staticプロパティへのインジェクションを許容するかどうか
      */
     public DiContainer(ComponentDefinitionLoader loader, boolean allowStaticInjection) {
-        this(loader, allowStaticInjection, new SystemPropertyExternalizedLoader());
-    }
-
-    /**
-     * コンストラクタ。
-     * @param loader コンポーネント定義のローダ
-     * @param allowStaticInjection staticプロパティへのインジェクションを許容するかどうか
-     * @param externalizedComponentDefinitionLoader 外部化されたコンポーネント定義のローダー
-     */
-    public DiContainer(ComponentDefinitionLoader loader, boolean allowStaticInjection, ExternalizedComponentDefinitionLoader externalizedComponentDefinitionLoader) {
         super();
         this.loader = loader;
         this.allowStaticInjection = allowStaticInjection;
-        this.externalizedComponentDefinitionLoader = externalizedComponentDefinitionLoader;
+        this.externalizedComponentDefinitionLoader = loadExternalizedComponentDefinitionLoader();
         reload();
+    }
+
+    /**
+     * {@link ExternalizedComponentDefinitionLoader}を{@link ServiceLoader}を使って読み込む。
+     * <p/>
+     * {@link ExternalizedComponentDefinitionLoader}のサービスプロバイダが設定されていない場合は、
+     * 後方互換を維持するために{@link SystemPropertyExternalizedLoader}が使用されます。
+     *
+     * @return ロードされた {@link ExternalizedComponentDefinitionLoader}
+     */
+    private ExternalizedComponentDefinitionLoader loadExternalizedComponentDefinitionLoader() {
+        ServiceLoader<ExternalizedComponentDefinitionLoader> serviceLoader
+                = ServiceLoader.load(ExternalizedComponentDefinitionLoader.class);
+
+        List<ExternalizedComponentDefinitionLoader> loaders = new ArrayList<ExternalizedComponentDefinitionLoader>();
+        for (ExternalizedComponentDefinitionLoader loader : serviceLoader) {
+            loaders.add(loader);
+        }
+
+        if (loaders.isEmpty()) {
+            return new SystemPropertyExternalizedLoader();
+        } else {
+            return new CompositeExternalizedLoader(loaders);
+        }
     }
 
     /**
@@ -699,4 +715,11 @@ public class DiContainer implements ObjectLoader {
         }
     }
 
+    /**
+     * 外部化コンポーネント定義のローダーを取得する。
+     * @return 外部化コンポーネント定義のローダー
+     */
+    ExternalizedComponentDefinitionLoader getExternalizedComponentDefinitionLoader() {
+        return externalizedComponentDefinitionLoader;
+    }
 }
