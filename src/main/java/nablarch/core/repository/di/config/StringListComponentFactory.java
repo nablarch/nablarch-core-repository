@@ -37,6 +37,9 @@ public class StringListComponentFactory implements ComponentFactory<List<String>
     @Override
     public List<String> createObject() {
         if (values == null) {
+            throw new NullPointerException("values must not be null.");
+        }
+        if (values.isEmpty()) {
             return Collections.emptyList();
         }
 
