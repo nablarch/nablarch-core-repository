@@ -30,7 +30,7 @@ public class StringListComponentFactoryTest {
 
     @Test
     public void testThrowsExceptionIfValuesIsNull() {
-        expectedException.expect(NullPointerException.class);
+        expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("values must not be null.");
 
         sut.setValues(null);
