@@ -8,6 +8,7 @@ import nablarch.core.repository.test.ContextClassLoaderExchanger;
 import nablarch.core.repository.test.component.normal.TestComponent;
 import nablarch.core.repository.test.component.normal.TestInjectionComponent;
 import nablarch.core.repository.test.component.normal.TestNamingComponent;
+import nablarch.core.repository.test.component.normal.TestReferenceInjectionComponent;
 import nablarch.core.util.ClassTraversal;
 import nablarch.core.util.ResourcesUtil;
 import org.junit.Rule;
@@ -73,6 +74,13 @@ public class AnnotationComponentDefinitionLoaderTest {
         assertNotNull(((TestInjectionComponent) injectedComponent).getComponent());
         assertNotNull(((TestInjectionComponent) injectedComponent).getComponent().getComponent());
         assertEquals("value", ((TestInjectionComponent) injectedComponent).getConfig());
+
+        // コンポーネント参照によるコンストラクタインジェクションのコンポーネント
+        Object refInjectedComponent = container.getComponentByName(TestReferenceInjectionComponent.class.getName());
+        assertNotNull(refInjectedComponent);
+        assertEquals(TestReferenceInjectionComponent.class, refInjectedComponent.getClass());
+        assertNotNull(((TestReferenceInjectionComponent) refInjectedComponent).getComponent());
+        assertEquals("dummy", ((TestReferenceInjectionComponent) refInjectedComponent).getComponent().getProperty());
     }
 
     @Rule
@@ -153,6 +161,7 @@ public class AnnotationComponentDefinitionLoaderTest {
 
     @Test
     public void testAbnormalClassNotFoundException() {
+        exchanger.setupContextClassLoader("normalAnnotation");
         try {
             // 存在しないクラスをClassHandlerに渡すResourcesを設定
             ResourcesUtil.addResourcesFactory("file", new ResourcesUtil.ResourcesFactory() {
@@ -164,6 +173,7 @@ public class AnnotationComponentDefinitionLoaderTest {
             new DiContainer(new SimpleComponentDefinitionLoader());
         } catch (RuntimeException e) {
             assertThat(e.getCause(), instanceOf(ClassNotFoundException.class));
+            return;
         } finally {
             ResourcesUtil.addResourcesFactory("file", new ResourcesUtil.ResourcesFactory() {
                 @Override
@@ -172,6 +182,7 @@ public class AnnotationComponentDefinitionLoaderTest {
                 }
             });
         }
+        fail("ここに到達したらExceptionが発生していない。");
     }
 
     private static class DummyFileResource implements ResourcesUtil.Resources {

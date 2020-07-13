@@ -3,6 +3,7 @@ package nablarch.core.repository.di.config;
 import nablarch.core.exception.IllegalConfigurationException;
 import nablarch.core.repository.di.ComponentDefinition;
 import nablarch.core.repository.di.DiContainer;
+import nablarch.core.repository.di.config.externalize.annotation.ComponentRef;
 import nablarch.core.repository.di.config.externalize.annotation.ConfigValue;
 
 import java.lang.annotation.Annotation;
@@ -63,6 +64,9 @@ public class ConstructorInjectionComponentCreator extends BeanComponentCreator {
         for (Annotation annotation : annotations) {
             if (annotation instanceof ConfigValue) {
                 return getConfigValueComponent(container, (ConfigValue) annotation);
+            }
+            if (annotation instanceof ComponentRef) {
+                return container.getComponentByName(((ComponentRef) annotation).value());
             }
         }
         return container.getComponentByType(type);
