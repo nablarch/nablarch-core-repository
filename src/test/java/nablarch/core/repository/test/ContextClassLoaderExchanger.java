@@ -28,14 +28,14 @@ public class ContextClassLoaderExchanger extends ExternalResource {
     /**
      * コンテキストクラスローダーを差し替える。
      * <p/>
-     * 差し替え後のコンテキストクラスローダーは、{@code "nablarch.core.repository.test.ContextClassLoaderExchanger.<subDirName>"}
+     * 差し替え後のコンテキストクラスローダーは、{@code "nablarch.core.repository.test.<subDirName>"}
      * をリソースルートとして振舞います。<br/>
      * これにより、テストケースごとにサービスプロバイダーの設定ファイルを分けることが可能になります。
      *
      * @param subDirName サブディレクトリ名
      */
     public void setupContextClassLoader(String subDirName) {
-        URL customRootDir = ContextClassLoaderExchanger.class.getResource("./ContextClassLoaderExchanger/" + subDirName + "/");
+        URL customRootDir = ContextClassLoaderExchanger.class.getResource("./" + subDirName + "/");
         URLClassLoader customClassLoader = new URLClassLoader(new URL[]{customRootDir}, originalContextClassLoader);
         Thread.currentThread().setContextClassLoader(customClassLoader);
     }
