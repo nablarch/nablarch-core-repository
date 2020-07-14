@@ -6,7 +6,7 @@ import nablarch.core.repository.di.ComponentHolder;
 import nablarch.core.repository.di.DiContainer;
 import nablarch.core.repository.di.config.ConstructorInjectionComponentCreator;
 import nablarch.core.repository.di.config.externalize.annotation.SystemRepositoryComponent;
-import nablarch.core.util.ClassTraversal;
+import nablarch.core.util.ClassTraversal.ClassHandler;
 import nablarch.core.util.ResourcesUtil;
 import nablarch.core.util.ResourcesUtil.Resources;
 
@@ -44,7 +44,7 @@ public abstract class AnnotationComponentDefinitionLoader implements Externalize
 
     @Override
     public List<ComponentDefinition> load(final DiContainer container, Map<String, ComponentHolder> loadedComponents) {
-        AnnotatedComponentFinder classHandler = new AnnotatedComponentFinder(container);
+        ResourceClassHandler classHandler = new ResourceClassHandler(container);
         for (Resources resources : ResourcesUtil.getResourcesTypes(basePackage)) {
             resources.forEach(classHandler);
 
@@ -56,12 +56,12 @@ public abstract class AnnotationComponentDefinitionLoader implements Externalize
      * {@link SystemRepositoryComponent}で修飾されたコンポーネントを見つけ、{@link ConstructorInjectionComponentCreator}を持つ
      * {@link ComponentDefinition}を生成してListに保持する{@link nablarch.core.util.ClassTraversal.ClassHandler}実装クラス。
      */
-    private static class AnnotatedComponentFinder implements ClassTraversal.ClassHandler {
+    private static class ResourceClassHandler implements ClassHandler {
         private final List<ComponentDefinition> definitions = new ArrayList<ComponentDefinition>();
         private final ComponentCreator componentCreator = new ConstructorInjectionComponentCreator();
         private final DiContainer container;
 
-        AnnotatedComponentFinder(DiContainer container) {
+        ResourceClassHandler(DiContainer container) {
             this.container = container;
         }
 

@@ -7,7 +7,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * コンストラクタ引数がインジェクト対象であることを表すアノテーション。
+ * コンストラクタ引数が設定値のインジェクト対象であることを表すアノテーション。
  *
  * @see nablarch.core.repository.di.config.ConstructorInjectionComponentCreator
  */

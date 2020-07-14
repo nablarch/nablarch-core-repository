@@ -1,7 +1,7 @@
 package nablarch.core.repository.di.config;
 
-import nablarch.core.exception.IllegalConfigurationException;
 import nablarch.core.repository.di.ComponentDefinition;
+import nablarch.core.repository.di.ContainerProcessException;
 import nablarch.core.repository.di.DiContainer;
 import nablarch.core.repository.di.config.externalize.annotation.ComponentRef;
 import nablarch.core.repository.di.config.externalize.annotation.ConfigValue;
@@ -42,12 +42,19 @@ public class ConstructorInjectionComponentCreator extends BeanComponentCreator {
         try {
             return constructor.newInstance(args);
         } catch (InstantiationException e) {
-            throw new RuntimeException(e);
+            throw newContainerProcessException(constructor, e);
         } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
+            throw newContainerProcessException(constructor, e);
         } catch (InvocationTargetException e) {
-            throw new RuntimeException(e);
+            throw newContainerProcessException(constructor, e);
         }
+    }
+
+    private ContainerProcessException newContainerProcessException(Constructor<?> constructor, Exception cause) {
+        return new ContainerProcessException(
+                "component instantiation failed."
+                        + " component class name = " + constructor.getDeclaringClass().getName()
+                , cause);
     }
 
     /**
@@ -66,7 +73,7 @@ public class ConstructorInjectionComponentCreator extends BeanComponentCreator {
                 return getConfigValueComponent(container, (ConfigValue) annotation);
             }
             if (annotation instanceof ComponentRef) {
-                return container.getComponentByName(((ComponentRef) annotation).value());
+                return getReferenceComponent(container, ((ComponentRef) annotation));
             }
         }
         return container.getComponentByType(type);
@@ -75,18 +82,34 @@ public class ConstructorInjectionComponentCreator extends BeanComponentCreator {
     /**
      * {@link ConfigValue}の情報をもとにコンポーネントを取得する。
      *
-     * @param container             DIコンテナ
-     * @param configValueAnnotation アノテーション
+     * @param container  DIコンテナ
+     * @param annotation アノテーション
      * @return {@link ConfigValue}の名前で取得したコンポーネント
      */
-    private Object getConfigValueComponent(DiContainer container, ConfigValue configValueAnnotation) {
-        String name = configValueAnnotation.value();
+    private Object getConfigValueComponent(DiContainer container, ConfigValue annotation) {
+        String name = annotation.value();
         Object component = container.getComponentByName(name);
         if (component == null) {
-            throw new IllegalConfigurationException("'" + name + "' of configuration value is not found.");
+            throw new ContainerProcessException("configuration value was not found. name = " + name);
         }
         if (!(component instanceof String)) {
-            throw new IllegalConfigurationException("'" + name + "' of configuration value is not a String.");
+            throw new ContainerProcessException("configuration value is not a String. name = " + name);
+        }
+        return component;
+    }
+
+    /**
+     * {@link ComponentRef}の情報をもとにコンポーネントを取得する。
+     *
+     * @param container  DIコンテナ
+     * @param annotation アノテーション
+     * @return {@link ComponentRef}の名前で取得したコンポーネント
+     */
+    private Object getReferenceComponent(DiContainer container, ComponentRef annotation) {
+        String name = annotation.value();
+        Object component = container.getComponentByName(name);
+        if (component == null) {
+            throw new ContainerProcessException("component name to reference was not found. name = " + name);
         }
         return component;
     }
