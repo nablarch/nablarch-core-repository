@@ -1,5 +1,6 @@
 package nablarch.core.repository.di.config.externalize;
 
+import nablarch.core.exception.IllegalConfigurationException;
 import nablarch.core.repository.di.ContainerProcessException;
 import nablarch.core.repository.di.DiContainer;
 import nablarch.core.repository.di.SimpleComponentDefinitionLoader;
@@ -19,9 +20,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 
 import static nablarch.core.util.ResourcesUtil.getBaseDir;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isA;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 /**
@@ -69,9 +73,15 @@ public class AnnotationComponentDefinitionLoaderTest {
         Object injectedComponent = container.getComponentByName(TestInjectionComponent.class.getName());
         assertNotNull(injectedComponent);
         assertEquals(TestInjectionComponent.class, injectedComponent.getClass());
-        assertNotNull(((TestInjectionComponent) injectedComponent).getComponent());
-        assertNotNull(((TestInjectionComponent) injectedComponent).getComponent().getComponent());
-        assertEquals("value", ((TestInjectionComponent) injectedComponent).getConfig());
+        TestInjectionComponent testInjectionComponent = (TestInjectionComponent) injectedComponent;
+        assertNotNull(testInjectionComponent.getComponent());
+        assertNotNull(testInjectionComponent.getComponent().getComponent());
+        assertThat(testInjectionComponent.getStringConfig(), is("value"));
+        assertThat(testInjectionComponent.getStringArrayConfig(), is(new String[]{"a", "b", "c"}));
+        assertThat(testInjectionComponent.getIntConfig(), is(2));
+        assertThat(testInjectionComponent.getIntArrayConfig(), is(new int[]{1, 2, 3}));
+        assertThat(testInjectionComponent.getLongConfig(), is(8L));
+        assertTrue(testInjectionComponent.isBooleanConfig());
 
         // コンポーネント参照によるコンストラクタインジェクションのコンポーネント
         Object refInjectedComponent = container.getComponentByName(TestReferenceInjectionComponent.class.getName());
@@ -85,24 +95,16 @@ public class AnnotationComponentDefinitionLoaderTest {
     public ExpectedException expectedException = ExpectedException.none();
 
     @Test
-    public void testAbnormalConfigValueComponentIsNotRegistered() {
+    public void testAbnormalConfigValueIsNotNumber() {
         expectedException.expect(ContainerProcessException.class);
-        expectedException.expectMessage("configuration value was not found. name = config.value");
+        expectedException.expectMessage("config value is not number. name = ${config.value.integer}");
+        expectedException.expectCause(isA(NumberFormatException.class));
 
         exchanger.setupContextClassLoader("normalAnnotation");
-        new DiContainer(new SimpleComponentDefinitionLoader());
-        fail("ここに到達したらExceptionが発生していない。");
-    }
-
-    @Test
-    public void testAbnormalConfigValueComponentIsNotStringInstance() {
-        expectedException.expect(ContainerProcessException.class);
-        expectedException.expectMessage("configuration value is not a String. name = config.value");
-
-        exchanger.setupContextClassLoader("normalAnnotation");
+        // コンストラクタインジェクション用の設定値を読み込むローダー
         XmlComponentDefinitionLoader loader = new XmlComponentDefinitionLoader(
-                "nablarch/core/repository/di/config/externalize/test-abnormal-config-value-is-not-string.xml");
-        new DiContainer(loader);
+                "nablarch/core/repository/di/config/externalize/test-abnormal-config-value-is-not-number.xml");
+        DiContainer container = new DiContainer(loader);
         fail("ここに到達したらExceptionが発生していない。");
     }
 
@@ -114,6 +116,70 @@ public class AnnotationComponentDefinitionLoaderTest {
         exchanger.setupContextClassLoader("normalAnnotation");
         XmlComponentDefinitionLoader loader = new XmlComponentDefinitionLoader(
                 "nablarch/core/repository/di/config/externalize/test-abnormal-reference-component-not-found.xml");
+        new DiContainer(loader);
+        fail("ここに到達したらExceptionが発生していない。");
+    }
+
+    public static class TestReferenceComponentIsNotAssignableLoader extends AnnotationComponentDefinitionLoader {
+        @Override
+        protected String getBasePackage() {
+            return "nablarch.core.repository.test.component.abnormal.assignable";
+        }
+    }
+
+    @Test
+    public void testAbnormalReferenceComponentIsNotAssignable() {
+        expectedException.expect(ContainerProcessException.class);
+        expectedException.expectMessage("referenced component type mismatch." +
+                " name = [dummyComponent]" +
+                " parameter type = [nablarch.core.repository.test.component.normal.TestReferenceInjectionDummyComponent]" +
+                " component type = [nablarch.core.repository.test.component.normal.TestComponent]");
+
+        exchanger.setupContextClassLoader("abnormalAnnotation/assignable");
+        XmlComponentDefinitionLoader loader = new XmlComponentDefinitionLoader(
+                "nablarch/core/repository/di/config/externalize/test-abnormal-reference-component-not-assignable.xml");
+        new DiContainer(loader);
+        fail("ここに到達したらExceptionが発生していない。");
+    }
+
+    public static class TestDuplicateSettingComponentRefFirstLoader extends AnnotationComponentDefinitionLoader {
+        @Override
+        protected String getBasePackage() {
+            return "nablarch.core.repository.test.component.abnormal.duplicate.componentRef";
+        }
+    }
+
+    @Test
+    public void testAbnormalDuplicateSettingComponentRefFirst() {
+        expectedException.expect(ContainerProcessException.class);
+        expectedException.expectMessage("component instantiation failed. " +
+                "component class name = nablarch.core.repository.test.component.abnormal.duplicate.componentRef.TestBothAnnotationSettingComponent");
+        expectedException.expectCause(isA(IllegalConfigurationException.class));
+
+        exchanger.setupContextClassLoader("abnormalAnnotation/duplicate/component");
+        XmlComponentDefinitionLoader loader = new XmlComponentDefinitionLoader(
+                "nablarch/core/repository/di/config/externalize/test.xml");
+        new DiContainer(loader);
+        fail("ここに到達したらExceptionが発生していない。");
+    }
+
+    public static class TestDuplicateSettingConfigValueFirstLoader extends AnnotationComponentDefinitionLoader {
+        @Override
+        protected String getBasePackage() {
+            return "nablarch.core.repository.test.component.abnormal.duplicate.configValue";
+        }
+    }
+
+    @Test
+    public void testAbnormalDuplicateSettingConfigValueFirst() {
+        expectedException.expect(ContainerProcessException.class);
+        expectedException.expectMessage("component instantiation failed. " +
+                "component class name = nablarch.core.repository.test.component.abnormal.duplicate.configValue.TestBothAnnotationSettingComponent");
+        expectedException.expectCause(isA(IllegalConfigurationException.class));
+
+        exchanger.setupContextClassLoader("abnormalAnnotation/duplicate/config");
+        XmlComponentDefinitionLoader loader = new XmlComponentDefinitionLoader(
+                "nablarch/core/repository/di/config/externalize/test.xml");
         new DiContainer(loader);
         fail("ここに到達したらExceptionが発生していない。");
     }
@@ -133,25 +199,6 @@ public class AnnotationComponentDefinitionLoaderTest {
         expectedException.expectCause(isA(InvocationTargetException.class));
 
         exchanger.setupContextClassLoader("abnormalAnnotation/invocationTarget");
-        new DiContainer(new SimpleComponentDefinitionLoader());
-        fail("ここに到達したらExceptionが発生していない。");
-    }
-
-    public static class TestIllegalAccessExceptionLoader extends AnnotationComponentDefinitionLoader {
-        @Override
-        protected String getBasePackage() {
-            return "nablarch.core.repository.test.component.abnormal.illegalAccess";
-        }
-    }
-
-    @Test
-    public void testAbnormalPrivateConstructor() {
-        expectedException.expect(ContainerProcessException.class);
-        expectedException.expectMessage("component instantiation failed. " +
-                "component class name = nablarch.core.repository.test.component.abnormal.illegalAccess.TestIllegalAccessComponent");
-        expectedException.expectCause(isA(IllegalAccessException.class));
-
-        exchanger.setupContextClassLoader("abnormalAnnotation/illegalAccess");
         new DiContainer(new SimpleComponentDefinitionLoader());
         fail("ここに到達したらExceptionが発生していない。");
     }

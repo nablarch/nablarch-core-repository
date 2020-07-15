@@ -1,5 +1,6 @@
 package nablarch.core.repository.di.config;
 
+import nablarch.core.exception.IllegalConfigurationException;
 import nablarch.core.repository.di.ComponentDefinition;
 import nablarch.core.repository.di.ContainerProcessException;
 import nablarch.core.repository.di.DiContainer;
@@ -17,7 +18,7 @@ public class ConstructorInjectionComponentCreator extends BeanComponentCreator {
 
     @Override
     public Object createComponent(DiContainer container, ComponentDefinition def) {
-        Constructor<?>[] constructors = def.getType().getDeclaredConstructors();
+        Constructor<?>[] constructors = def.getType().getConstructors();
         if (constructors.length == 1 && constructors[0].getParameterTypes().length != 0) {
             // 生成時に利用するコンストラクタが特定できるなら、コンストラクタインジェクションを行う
             return createComponentWithConstructorInjection(container, constructors[0]);
@@ -37,13 +38,18 @@ public class ConstructorInjectionComponentCreator extends BeanComponentCreator {
         final Annotation[][] annotations = constructor.getParameterAnnotations();
         Object[] args = new Object[types.length];
         for (int i = 0; i < types.length; i++) {
-            args[i] = getComponent(container, types[i], annotations[i]);
+            try {
+                args[i] = getComponent(container, types[i], annotations[i]);
+            } catch (IllegalConfigurationException e) {
+                throw newContainerProcessException(constructor, e);
+            }
         }
         try {
             return constructor.newInstance(args);
         } catch (InstantiationException e) {
             throw newContainerProcessException(constructor, e);
         } catch (IllegalAccessException e) {
+            // getConstructors()でpublicなコンストラクタしか扱わないためここにはこない。
             throw newContainerProcessException(constructor, e);
         } catch (InvocationTargetException e) {
             throw newContainerProcessException(constructor, e);
@@ -59,7 +65,7 @@ public class ConstructorInjectionComponentCreator extends BeanComponentCreator {
 
     /**
      * コンストラクタの引数にインジェクトするコンポーネントを取得する。
-     * {@link ConfigValue}が付与された引数の場合名前でコンポーネントを取得し
+     * {@link ConfigValue}、{@link ComponentRef}が付与された引数の場合名前でコンポーネントを取得
      * それ以外の引数は型でコンポーネントを取得する。
      *
      * @param container   DIコンテナ
@@ -68,34 +74,40 @@ public class ConstructorInjectionComponentCreator extends BeanComponentCreator {
      * @return インジェクトするコンポーネント
      */
     private Object getComponent(DiContainer container, Class<?> type, Annotation[] annotations) {
+        Object component = null;
         for (Annotation annotation : annotations) {
             if (annotation instanceof ConfigValue) {
-                return getConfigValueComponent(container, (ConfigValue) annotation);
+                if (component != null) {
+                    throw new IllegalConfigurationException("both @ConfigValue and @ComponentRef are set.");
+                }
+                component = getConfigValueComponent(container, type, (ConfigValue) annotation);
             }
             if (annotation instanceof ComponentRef) {
-                return getReferenceComponent(container, ((ComponentRef) annotation));
+                if (component != null) {
+                    throw new IllegalConfigurationException("both @ConfigValue and @ComponentRef are set.");
+                }
+                component = getReferenceComponent(container, type, (ComponentRef) annotation);
             }
+        }
+        if (component != null) {
+            return component;
         }
         return container.getComponentByType(type);
     }
 
     /**
-     * {@link ConfigValue}の情報をもとにコンポーネントを取得する。
+     * {@link ConfigValue}の情報をもとに設定値を取得する。
      *
      * @param container  DIコンテナ
      * @param annotation アノテーション
-     * @return {@link ConfigValue}の名前で取得したコンポーネント
+     * @return {@link ConfigValue}に指定した変数を解決した設定値
      */
-    private Object getConfigValueComponent(DiContainer container, ConfigValue annotation) {
-        String name = annotation.value();
-        Object component = container.getComponentByName(name);
-        if (component == null) {
-            throw new ContainerProcessException("configuration value was not found. name = " + name);
+    private Object getConfigValueComponent(DiContainer container, Class<?> type, ConfigValue annotation) {
+        try {
+            return LiteralExpressionUtil.convertLiteralExpressionToObject(container, annotation.value(), type);
+        } catch (NumberFormatException e) {
+            throw new ContainerProcessException("config value is not number. name = " + annotation.value(), e);
         }
-        if (!(component instanceof String)) {
-            throw new ContainerProcessException("configuration value is not a String. name = " + name);
-        }
-        return component;
     }
 
     /**
@@ -105,11 +117,17 @@ public class ConstructorInjectionComponentCreator extends BeanComponentCreator {
      * @param annotation アノテーション
      * @return {@link ComponentRef}の名前で取得したコンポーネント
      */
-    private Object getReferenceComponent(DiContainer container, ComponentRef annotation) {
+    private Object getReferenceComponent(DiContainer container, Class<?> type, ComponentRef annotation) {
         String name = annotation.value();
         Object component = container.getComponentByName(name);
         if (component == null) {
             throw new ContainerProcessException("component name to reference was not found. name = " + name);
+        }
+        if (!type.isAssignableFrom(component.getClass())) {
+            throw new ContainerProcessException("referenced component type mismatch."
+                    + " name = [" + name + "]"
+                    + " parameter type = [" + type.getName() + "]"
+                    + " component type = [" + component.getClass().getName() + "]");
         }
         return component;
     }

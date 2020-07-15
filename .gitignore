@@ -67,3 +67,5 @@ gradle-app.setting
 # Eclipse 
 .classpath
 .project
+
+target/

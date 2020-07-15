@@ -2,7 +2,7 @@
 <component-configuration xmlns="http://tis.co.jp/nablarch/component-configuration"
                          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                          xsi:schemaLocation="http://tis.co.jp/nablarch/component-configuration /home/ssd/workspace/Nablarch/resources/component-configuration.xsd">
-  <component name="config.value" class="nablarch.core.repository.test.component.normal.TestComponent"/>
+  <config-file file="nablarch/core/repository/di/config/externalize/test-abnormal.properties"/>
   <component name="dummyComponent"
              class="nablarch.core.repository.test.component.normal.TestReferenceInjectionDummyComponent">
     <property name="property" value="dummy"/>

@@ -44,7 +44,7 @@ public abstract class AnnotationComponentDefinitionLoader implements Externalize
 
     @Override
     public List<ComponentDefinition> load(final DiContainer container, Map<String, ComponentHolder> loadedComponents) {
-        ResourceClassHandler classHandler = new ResourceClassHandler(container);
+        ResourceClassHandler classHandler = new ResourceClassHandler(container, newComponentCreator(), this.getClass().getClassLoader());
         for (Resources resources : ResourcesUtil.getResourcesTypes(basePackage)) {
             resources.forEach(classHandler);
 
@@ -52,23 +52,30 @@ public abstract class AnnotationComponentDefinitionLoader implements Externalize
         return Collections.unmodifiableList(classHandler.getDefinitions());
     }
 
+    protected ComponentCreator newComponentCreator() {
+        return new ConstructorInjectionComponentCreator();
+    }
+
     /**
-     * {@link SystemRepositoryComponent}で修飾されたコンポーネントを見つけ、{@link ConstructorInjectionComponentCreator}を持つ
+     * {@link SystemRepositoryComponent}で修飾されたコンポーネントを見つけ、コンストラクタで指定された{@link ComponentCreator}を持つ
      * {@link ComponentDefinition}を生成してListに保持する{@link nablarch.core.util.ClassTraversal.ClassHandler}実装クラス。
      */
     private static class ResourceClassHandler implements ClassHandler {
         private final List<ComponentDefinition> definitions = new ArrayList<ComponentDefinition>();
-        private final ComponentCreator componentCreator = new ConstructorInjectionComponentCreator();
+        private final ComponentCreator componentCreator;
         private final DiContainer container;
+        private final ClassLoader classLoader;
 
-        ResourceClassHandler(DiContainer container) {
+        ResourceClassHandler(DiContainer container, ComponentCreator componentCreator, ClassLoader classLoader) {
             this.container = container;
+            this.componentCreator = componentCreator;
+            this.classLoader = classLoader;
         }
 
         @Override
         public void process(String packageName, String shortClassName) {
             try {
-                Class<?> type = this.getClass().getClassLoader().loadClass(packageName + "." + shortClassName);
+                Class<?> type = classLoader.loadClass(packageName + "." + shortClassName);
                 if (type.isAnnotationPresent(SystemRepositoryComponent.class)) {
                     definitions.add(new ComponentDefinition(container.generateId(),
                             getComponentName(type), componentCreator, type));
