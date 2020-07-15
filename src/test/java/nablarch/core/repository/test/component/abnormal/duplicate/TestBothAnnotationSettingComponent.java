@@ -1,4 +1,4 @@
-package nablarch.core.repository.test.component.abnormal.duplicate.configValue;
+package nablarch.core.repository.test.component.abnormal.duplicate;
 
 import nablarch.core.repository.di.config.externalize.annotation.ComponentRef;
 import nablarch.core.repository.di.config.externalize.annotation.ConfigValue;
@@ -6,7 +6,10 @@ import nablarch.core.repository.di.config.externalize.annotation.SystemRepositor
 
 @SystemRepositoryComponent
 public class TestBothAnnotationSettingComponent {
-    public TestBothAnnotationSettingComponent(@ConfigValue("${config.value.string}") @ComponentRef("config.value.string") String config) {
+    public TestBothAnnotationSettingComponent(
+            @ComponentRef("config.value.string")
+            @ConfigValue("${config.value.string}")
+                    String config) {
 
     }
 }

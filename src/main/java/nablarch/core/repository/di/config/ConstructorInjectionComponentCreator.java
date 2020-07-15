@@ -74,23 +74,23 @@ public class ConstructorInjectionComponentCreator extends BeanComponentCreator {
      * @return インジェクトするコンポーネント
      */
     private Object getComponent(DiContainer container, Class<?> type, Annotation[] annotations) {
-        Object component = null;
+        ConfigValue configValue = null;
+        ComponentRef componentRef = null;
         for (Annotation annotation : annotations) {
             if (annotation instanceof ConfigValue) {
-                if (component != null) {
-                    throw new IllegalConfigurationException("both @ConfigValue and @ComponentRef are set.");
-                }
-                component = getConfigValueComponent(container, type, (ConfigValue) annotation);
-            }
-            if (annotation instanceof ComponentRef) {
-                if (component != null) {
-                    throw new IllegalConfigurationException("both @ConfigValue and @ComponentRef are set.");
-                }
-                component = getReferenceComponent(container, type, (ComponentRef) annotation);
+                configValue = (ConfigValue) annotation;
+            } else if (annotation instanceof ComponentRef) {
+                componentRef = (ComponentRef) annotation;
             }
         }
-        if (component != null) {
-            return component;
+        if (configValue != null && componentRef != null) {
+            throw new IllegalConfigurationException("both @ConfigValue and @ComponentRef are set.");
+        }
+        if (configValue != null) {
+            return getConfigValueComponent(container, type, configValue);
+        }
+        if (componentRef != null) {
+            return getReferenceComponent(container, type, componentRef);
         }
         return container.getComponentByType(type);
     }

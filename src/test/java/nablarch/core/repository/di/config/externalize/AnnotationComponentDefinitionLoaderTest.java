@@ -142,42 +142,21 @@ public class AnnotationComponentDefinitionLoaderTest {
         fail("ここに到達したらExceptionが発生していない。");
     }
 
-    public static class TestDuplicateSettingComponentRefFirstLoader extends AnnotationComponentDefinitionLoader {
+    public static class TestDuplicateSettingLoader extends AnnotationComponentDefinitionLoader {
         @Override
         protected String getBasePackage() {
-            return "nablarch.core.repository.test.component.abnormal.duplicate.componentRef";
+            return "nablarch.core.repository.test.component.abnormal.duplicate";
         }
     }
 
     @Test
-    public void testAbnormalDuplicateSettingComponentRefFirst() {
+    public void testAbnormalDuplicateSetting() {
         expectedException.expect(ContainerProcessException.class);
         expectedException.expectMessage("component instantiation failed. " +
-                "component class name = nablarch.core.repository.test.component.abnormal.duplicate.componentRef.TestBothAnnotationSettingComponent");
+                "component class name = nablarch.core.repository.test.component.abnormal.duplicate.TestBothAnnotationSettingComponent");
         expectedException.expectCause(isA(IllegalConfigurationException.class));
 
-        exchanger.setupContextClassLoader("abnormalAnnotation/duplicate/component");
-        XmlComponentDefinitionLoader loader = new XmlComponentDefinitionLoader(
-                "nablarch/core/repository/di/config/externalize/test.xml");
-        new DiContainer(loader);
-        fail("ここに到達したらExceptionが発生していない。");
-    }
-
-    public static class TestDuplicateSettingConfigValueFirstLoader extends AnnotationComponentDefinitionLoader {
-        @Override
-        protected String getBasePackage() {
-            return "nablarch.core.repository.test.component.abnormal.duplicate.configValue";
-        }
-    }
-
-    @Test
-    public void testAbnormalDuplicateSettingConfigValueFirst() {
-        expectedException.expect(ContainerProcessException.class);
-        expectedException.expectMessage("component instantiation failed. " +
-                "component class name = nablarch.core.repository.test.component.abnormal.duplicate.configValue.TestBothAnnotationSettingComponent");
-        expectedException.expectCause(isA(IllegalConfigurationException.class));
-
-        exchanger.setupContextClassLoader("abnormalAnnotation/duplicate/config");
+        exchanger.setupContextClassLoader("abnormalAnnotation/duplicate");
         XmlComponentDefinitionLoader loader = new XmlComponentDefinitionLoader(
                 "nablarch/core/repository/di/config/externalize/test.xml");
         new DiContainer(loader);
