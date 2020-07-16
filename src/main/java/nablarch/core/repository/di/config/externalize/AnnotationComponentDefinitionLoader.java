@@ -23,18 +23,6 @@ import java.util.Map;
  * ローダーの使用時にサブクラスを作成し、オーバーライドすること。
  */
 public abstract class AnnotationComponentDefinitionLoader implements ExternalizedComponentDefinitionLoader {
-    /** スキャンの基点となるパッケージ */
-    private final String basePackage;
-
-    /**
-     * コンストラクタ。
-     * サブクラスでオーバーライドした{@link #getBasePackage()}を呼び出し
-     * {@link #basePackage}に設定する。
-     */
-    public AnnotationComponentDefinitionLoader() {
-        this.basePackage = getBasePackage();
-    }
-
     /**
      * スキャン対象のパッケージを返す。
      *
@@ -44,8 +32,8 @@ public abstract class AnnotationComponentDefinitionLoader implements Externalize
 
     @Override
     public List<ComponentDefinition> load(final DiContainer container, Map<String, ComponentHolder> loadedComponents) {
-        ResourceClassHandler classHandler = new ResourceClassHandler(container, newComponentCreator(), this.getClass().getClassLoader());
-        for (Resources resources : ResourcesUtil.getResourcesTypes(basePackage)) {
+        ResourceClassHandler classHandler = new ResourceClassHandler(container, newComponentCreator(), getClass().getClassLoader());
+        for (Resources resources : ResourcesUtil.getResourcesTypes(getBasePackage())) {
             resources.forEach(classHandler);
 
         }
