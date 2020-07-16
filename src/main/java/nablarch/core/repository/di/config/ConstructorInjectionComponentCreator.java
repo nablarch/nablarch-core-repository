@@ -115,6 +115,7 @@ public class ConstructorInjectionComponentCreator extends BeanComponentCreator {
      * {@link ComponentRef}の情報をもとにコンポーネントを取得する。
      *
      * @param container  DIコンテナ
+     * @param type       コンストラクタ引数の型
      * @param annotation アノテーション
      * @return {@link ComponentRef}の名前で取得したコンポーネント
      */
