@@ -123,7 +123,7 @@ public class ConstructorInjectionComponentCreator extends BeanComponentCreator {
         if (component == null) {
             throw new ContainerProcessException("component name to reference was not found. name = " + name);
         }
-        if (!type.isAssignableFrom(component.getClass())) {
+        if (!type.isInstance(component)) {
             throw new ContainerProcessException("referenced component type mismatch."
                     + " name = [" + name + "]"
                     + " parameter type = [" + type.getName() + "]"
