@@ -99,6 +99,7 @@ public class ConstructorInjectionComponentCreator extends BeanComponentCreator {
      * {@link ConfigValue}の情報をもとに設定値を取得する。
      *
      * @param container  DIコンテナ
+     * @param type       コンストラクタ引数の型
      * @param annotation アノテーション
      * @return {@link ConfigValue}に指定した変数を解決した設定値
      */
