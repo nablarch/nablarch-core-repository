@@ -111,7 +111,7 @@ public class DiContainer implements ObjectLoader {
      *
      * @return ロードされた {@link ExternalizedComponentDefinitionLoader}
      */
-    private ExternalizedComponentDefinitionLoader loadExternalizedComponentDefinitionLoader() {
+    protected ExternalizedComponentDefinitionLoader loadExternalizedComponentDefinitionLoader() {
         ServiceLoader<ExternalizedComponentDefinitionLoader> serviceLoader
                 = ServiceLoader.load(ExternalizedComponentDefinitionLoader.class);
 
