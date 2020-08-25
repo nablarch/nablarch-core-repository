@@ -3,6 +3,7 @@ package nablarch.core.repository.test.component.normal;
 
 import nablarch.core.repository.di.config.externalize.annotation.ConfigValue;
 import nablarch.core.repository.di.config.externalize.annotation.SystemRepositoryComponent;
+import nablarch.core.repository.test.annotation.DummyAnnotation;
 
 @SystemRepositoryComponent
 public class TestInjectionComponent {
@@ -15,6 +16,7 @@ public class TestInjectionComponent {
     private final int[] intArrayConfig;
     private final long longConfig;
     private final boolean booleanConfig;
+    private final String dummy;
 
     public TestInjectionComponent(TestInjectionDummyComponent component
             , @ConfigValue("${config.value.string}") String stringConfig
@@ -22,7 +24,8 @@ public class TestInjectionComponent {
             , @ConfigValue("${config.value.integer}") int intConfig
             , @ConfigValue("${config.value.integer.array}") int[] intArrayConfig
             , @ConfigValue("${config.value.long}") long longConfig
-            , @ConfigValue("${config.value.boolean}") boolean booleanConfig) {
+            , @ConfigValue("${config.value.boolean}") boolean booleanConfig
+            , @DummyAnnotation("dummy") String dummy) {
         this.component = component;
         this.stringConfig = stringConfig;
         this.stringArrayConfig = stringArrayConfig;
@@ -30,6 +33,7 @@ public class TestInjectionComponent {
         this.intArrayConfig = intArrayConfig;
         this.longConfig = longConfig;
         this.booleanConfig = booleanConfig;
+        this.dummy = dummy;
     }
 
     public TestInjectionDummyComponent getComponent() {
@@ -58,5 +62,9 @@ public class TestInjectionComponent {
 
     public boolean isBooleanConfig() {
         return booleanConfig;
+    }
+
+    public String getDummy() {
+        return dummy;
     }
 }

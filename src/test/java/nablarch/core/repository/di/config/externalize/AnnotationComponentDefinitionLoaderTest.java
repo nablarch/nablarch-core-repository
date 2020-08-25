@@ -8,6 +8,7 @@ import nablarch.core.repository.di.config.xml.XmlComponentDefinitionLoader;
 import nablarch.core.repository.test.ContextClassLoaderExchanger;
 import nablarch.core.repository.test.component.normal.TestComponent;
 import nablarch.core.repository.test.component.normal.TestInjectionComponent;
+import nablarch.core.repository.test.component.normal.TestMultipleConstructorComponent;
 import nablarch.core.repository.test.component.normal.TestNamingComponent;
 import nablarch.core.repository.test.component.normal.TestReferenceInjectionComponent;
 import nablarch.core.util.ClassTraversal;
@@ -24,6 +25,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.isA;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -56,6 +58,12 @@ public class AnnotationComponentDefinitionLoaderTest {
         assertNotNull(testComponent);
         assertEquals(TestComponent.class, testComponent.getClass());
 
+        // コンストラクタが複数あるコンポーネント
+        Object testMultipleConstructorComponent = container.getComponentByName(TestMultipleConstructorComponent.class.getName());
+        assertNotNull(testMultipleConstructorComponent);
+        assertEquals(TestMultipleConstructorComponent.class, testMultipleConstructorComponent.getClass());
+        assertNull(((TestMultipleConstructorComponent) testMultipleConstructorComponent).getComponent());
+
         // インナークラスのコンポーネント
         Object innerComponent = container.getComponentByName(TestComponent.TestInnerComponent.class.getName());
         assertNotNull(innerComponent);
@@ -82,6 +90,7 @@ public class AnnotationComponentDefinitionLoaderTest {
         assertThat(testInjectionComponent.getIntArrayConfig(), is(new int[]{1, 2, 3}));
         assertThat(testInjectionComponent.getLongConfig(), is(8L));
         assertTrue(testInjectionComponent.isBooleanConfig());
+        assertNull(testInjectionComponent.getDummy());
 
         // コンポーネント参照によるコンストラクタインジェクションのコンポーネント
         Object refInjectedComponent = container.getComponentByName(TestReferenceInjectionComponent.class.getName());
