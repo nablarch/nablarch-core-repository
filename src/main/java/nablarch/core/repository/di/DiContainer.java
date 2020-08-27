@@ -175,7 +175,7 @@ public class DiContainer implements ObjectLoader {
     public void reload() {
         maxId = 0;
         List<ComponentDefinition> defs = loader.load(this);
-        if (LOGGER.isDebugEnabled()) {
+        if (LOGGER.isTraceEnabled()) {
             dump(defs);
         }
 
