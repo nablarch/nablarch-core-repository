@@ -113,12 +113,41 @@ public class BasicApplicationDisposerTest {
         assertThat(disposable1.invoked, is(true));
     }
 
+    @Test
+    public void testDisposeIsIgnoredAfterFirstTime() {
+        CountUpMockDisposable disposable = new CountUpMockDisposable();
+
+        sut.addDisposable(disposable);
+
+        // first time
+        sut.dispose();
+
+        assertThat(disposable.count, is(1));
+
+        // after first time
+        sut.dispose();
+        sut.dispose();
+        sut.dispose();
+        sut.dispose();
+
+        assertThat(disposable.count, is(1));
+    }
+
     private static class MockDisposable implements Disposable {
         private boolean invoked;
 
         @Override
         public void dispose() throws Exception {
             invoked = true;
+        }
+    }
+
+    private static class CountUpMockDisposable implements Disposable {
+        private int count;
+
+        @Override
+        public void dispose() throws Exception {
+            count++;
         }
     }
 

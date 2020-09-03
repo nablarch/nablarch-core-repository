@@ -18,6 +18,13 @@ public class BasicApplicationDisposer implements ApplicationDisposer {
     private static final Logger LOGGER = LoggerManager.get(BasicApplicationDisposer.class);
     private List<Disposable> disposableList = new ArrayList<Disposable>();
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * このメソッドを一度実行すると{@link Disposable}の参照は破棄されるため、
+     * 二回以上実行しても同じ廃棄処理が何度も繰り返されることはない。
+     * </p>
+     */
     @Override
     public synchronized void dispose() {
         /*
@@ -37,6 +44,8 @@ public class BasicApplicationDisposer implements ApplicationDisposer {
                 LOGGER.logWarn("Failed to dispose component (disposable=" + disposable + ").", exception);
             }
         }
+
+        disposableList.clear();
     }
 
     /**
