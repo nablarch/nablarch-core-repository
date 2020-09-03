@@ -18,6 +18,13 @@ public class BasicApplicationDisposer implements ApplicationDisposer {
 
     @Override
     public void dispose() {
+        /*
+         * ■逆順に dispose している理由
+         * 一般的に廃棄しなければならないオブジェクトは、開いた順番にインスタンスが生成される。
+         * そして、その順番で disposableList に設定される可能性が考えられる。
+         * この場合、廃棄処理は開いた順番とは逆の順序で行うことが望ましい（例：JDBC の Connection, Statement, ResultSet）。
+         * したがって、 dispose はリストを逆順にして実行している。
+         */
         ArrayList<Disposable> copyList = new ArrayList<Disposable>(disposableList);
         Collections.reverse(copyList);
 
