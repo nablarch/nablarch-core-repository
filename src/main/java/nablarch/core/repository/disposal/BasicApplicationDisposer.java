@@ -4,6 +4,7 @@ import nablarch.core.log.Logger;
 import nablarch.core.log.LoggerManager;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -17,7 +18,10 @@ public class BasicApplicationDisposer implements ApplicationDisposer {
 
     @Override
     public void dispose() {
-        for (Disposable disposable : disposableList) {
+        ArrayList<Disposable> copyList = new ArrayList<Disposable>(disposableList);
+        Collections.reverse(copyList);
+
+        for (Disposable disposable : copyList) {
             try {
                 disposable.dispose();
             } catch (Exception exception) {

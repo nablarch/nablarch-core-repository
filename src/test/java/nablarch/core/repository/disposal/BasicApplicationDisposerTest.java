@@ -4,8 +4,11 @@ import nablarch.core.repository.test.OnMemoryLogWriter;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -35,6 +38,36 @@ public class BasicApplicationDisposerTest {
         assertThat(disposable2.invoked, is(true));
         assertThat(disposable3.invoked, is(true));
         assertThat(disposable4.invoked, is(false));
+    }
+
+    @Test
+    public void testDisposeListInReverseOrder() {
+        final List<String> disposedOrder = new ArrayList<String>();
+
+        sut.setDisposableList(Arrays.<Disposable>asList(
+            new Disposable() {
+                @Override
+                public void dispose() throws Exception {
+                    disposedOrder.add("third");
+                }
+            },
+            new Disposable() {
+                @Override
+                public void dispose() throws Exception {
+                    disposedOrder.add("second");
+                }
+            },
+            new Disposable() {
+                @Override
+                public void dispose() throws Exception {
+                    disposedOrder.add("first");
+                }
+            }
+        ));
+
+        sut.dispose();
+
+        assertThat(disposedOrder, contains("first", "second", "third"));
     }
 
     @Test
