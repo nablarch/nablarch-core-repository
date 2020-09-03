@@ -38,10 +38,7 @@ public class BasicApplicationDisposer implements ApplicationDisposer {
         this.disposableList = new ArrayList<Disposable>(disposableList);
     }
 
-    /**
-     * {@link Disposable}を追加する。
-     * @param disposable 追加する{@link Disposable}
-     */
+    @Override
     public void addDisposable(Disposable disposable) {
         disposableList.add(disposable);
     }
