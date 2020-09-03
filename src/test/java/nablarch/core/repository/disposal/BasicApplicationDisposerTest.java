@@ -39,9 +39,9 @@ public class BasicApplicationDisposerTest {
 
     @Test
     public void testAddDisposable() {
-        sut.add(disposable2);
-        sut.add(disposable3);
-        sut.add(disposable4);
+        sut.addDisposable(disposable2);
+        sut.addDisposable(disposable3);
+        sut.addDisposable(disposable4);
 
         sut.dispose();
 
@@ -54,7 +54,7 @@ public class BasicApplicationDisposerTest {
     @Test
     public void testAddDisposableAfterSetDisposableList() {
         sut.setDisposableList(Arrays.<Disposable>asList(disposable1, disposable2));
-        sut.add(disposable4);
+        sut.addDisposable(disposable4);
 
         sut.dispose();
 
@@ -66,9 +66,9 @@ public class BasicApplicationDisposerTest {
 
     @Test
     public void testLogThrownExceptionAndContinueNextDisposable() {
-        sut.add(new ErrorDisposable(new NullPointerException("test NullPointerException")));
-        sut.add(new ErrorDisposable(new IllegalArgumentException("test IllegalArgumentException")));
-        sut.add(disposable1);
+        sut.addDisposable(new ErrorDisposable(new NullPointerException("test NullPointerException")));
+        sut.addDisposable(new ErrorDisposable(new IllegalArgumentException("test IllegalArgumentException")));
+        sut.addDisposable(disposable1);
 
         sut.dispose();
 

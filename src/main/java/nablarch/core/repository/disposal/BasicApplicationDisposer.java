@@ -38,7 +38,7 @@ public class BasicApplicationDisposer implements ApplicationDisposer {
      * {@link Disposable}を追加する。
      * @param disposable 追加する{@link Disposable}
      */
-    public void add(Disposable disposable) {
+    public void addDisposable(Disposable disposable) {
         disposableList.add(disposable);
     }
 }
