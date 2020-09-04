@@ -4,7 +4,6 @@ import nablarch.core.log.Logger;
 import nablarch.core.log.LoggerManager;
 
 import java.io.Closeable;
-import java.io.IOException;
 
 /**
  * {@link Closeable}オブジェクトを{@link Disposable}として扱うためのアダプタ。
@@ -20,12 +19,8 @@ public class DisposableAdaptor implements Disposable {
     private Closeable target;
 
     @Override
-    public void dispose() {
-        try {
-            target.close();
-        } catch (IOException e) {
-            LOGGER.logWarn("Failed to close target (target=" + target + ").", e);
-        }
+    public void dispose() throws Exception {
+        target.close();
     }
 
     /**
