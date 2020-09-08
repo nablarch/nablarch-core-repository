@@ -1,8 +1,5 @@
 package nablarch.core.repository.disposal;
 
-import nablarch.core.log.Logger;
-import nablarch.core.log.LoggerManager;
-
 import java.io.Closeable;
 
 /**
@@ -14,8 +11,6 @@ import java.io.Closeable;
  * @author Tanaka Tomoyuki
  */
 public class DisposableAdaptor implements Disposable {
-    private static final Logger LOGGER = LoggerManager.get(DisposableAdaptor.class);
-
     private Closeable target;
 
     @Override
