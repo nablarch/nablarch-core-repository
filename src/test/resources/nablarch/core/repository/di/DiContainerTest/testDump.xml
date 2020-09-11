@@ -1,0 +1,9 @@
+<component-configuration
+    xmlns="http://tis.co.jp/nablarch/component-configuration"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://tis.co.jp/nablarch/component-configuration component-configuration.xsd">
+
+  <component name="comp5" class="nablarch.core.repository.di.test.Component5" />
+  <component name="comp6" class="nablarch.core.repository.di.test.Component6" />
+
+</component-configuration>
