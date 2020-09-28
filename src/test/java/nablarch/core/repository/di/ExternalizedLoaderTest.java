@@ -4,12 +4,10 @@ import nablarch.core.repository.di.config.externalize.CompositeExternalizedLoade
 import nablarch.core.repository.di.config.externalize.ExternalizedComponentDefinitionLoader;
 import nablarch.core.repository.di.config.externalize.OsEnvironmentVariableExternalizedLoader;
 import nablarch.core.repository.di.config.externalize.SystemPropertyExternalizedLoader;
-import org.junit.After;
-import org.junit.Before;
+import nablarch.core.repository.test.ContextClassLoaderExchanger;
+import org.junit.Rule;
 import org.junit.Test;
 
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.List;
 
 import static org.hamcrest.Matchers.contains;
@@ -22,12 +20,8 @@ import static org.junit.Assert.assertThat;
  * @author Tomoyuki Tanaka
  */
 public class ExternalizedLoaderTest {
-    private ClassLoader originalContextClassLoader;
-
-    @Before
-    public void setUp() {
-        originalContextClassLoader = Thread.currentThread().getContextClassLoader();
-    }
+    @Rule
+    public ContextClassLoaderExchanger exchanger = new ContextClassLoaderExchanger();
 
     /*
      * コンテキストクラスローダーの差し替えを行っていない理由。
@@ -57,7 +51,7 @@ public class ExternalizedLoaderTest {
 
     @Test
     public void testExternalizedLoadersAreLoadedByServiceLoaderMechanism() {
-        setupContextClassLoader("testServiceLoader");
+        exchanger.setupContextClassLoader("testServiceLoader");
         DiContainer container = new DiContainer(new SimpleComponentDefinitionLoader());
 
         ExternalizedComponentDefinitionLoader loader = container.getExternalizedComponentDefinitionLoader();
@@ -71,23 +65,4 @@ public class ExternalizedLoaderTest {
                 instanceOf(SystemPropertyExternalizedLoader.class)));
     }
 
-    /**
-     * コンテキストクラスローダーをテスト用に差し替える。
-     * <p/>
-     * 差し替え後のコンテキストクラスローダーは、{@code "nablarch.core.repository.di.ExternalizedLoaderTest.<subDirName>"}
-     * をリソースルートとして振舞います。<br/>
-     * これにより、テストケースごとにサービスプロバイダーの設定ファイルを分けることが可能になります。
-     *
-     * @param subDirName サブディレクトリ名
-     */
-    private void setupContextClassLoader(String subDirName) {
-        URL customRootDir = ExternalizedLoaderTest.class.getResource("./ExternalizedLoaderTest/" + subDirName + "/");
-        URLClassLoader customClassLoader = new URLClassLoader(new URL[] {customRootDir}, originalContextClassLoader);
-        Thread.currentThread().setContextClassLoader(customClassLoader);
-    }
-
-    @After
-    public void tearDown() {
-        Thread.currentThread().setContextClassLoader(originalContextClassLoader);
-    }
 }

@@ -117,6 +117,35 @@ public class DiContainerTest {
     }
 
     @Test
+    public void testDump() {
+        XmlComponentDefinitionLoader loader = new XmlComponentDefinitionLoader(
+                "nablarch/core/repository/di/DiContainerTest/testDump.xml");
+        new DiContainer(loader);
+
+        OnMemoryLogWriter.assertLogContains("writer.appLog",
+                "definition loaded id = 0\n" +
+                "\t type = class nablarch.core.repository.di.test.Component5\n" +
+                "\t name = comp5\n" +
+                "\t component information = [nablarch.core.repository.di.config.BeanComponentCreator@",
+
+                "\t------------------- component ref ------------------\n" +
+                "\t------------------- component ref ------------------\n",
+
+                "definition loaded id = 1\n" +
+                "\t type = class nablarch.core.repository.di.test.Component6\n" +
+                "\t name = comp6\n" +
+                "\t component information = [nablarch.core.repository.di.config.BeanComponentCreator@",
+
+                "\t------------------- component ref ------------------\n" +
+                "\t property name = interface1\n" +
+                "\t target id = -1\n" +
+                "\t component name = null\n" +
+                "\t required type = interface nablarch.core.repository.di.test.Interface1\n" +
+                "\n" +
+                "\t------------------- component ref ------------------\n");
+    }
+
+    @Test
     public void testLoad() throws Throwable {
         XmlComponentDefinitionLoader loader = new XmlComponentDefinitionLoader(
                 "nablarch/core/repository/di/DiContainerTest/testLoad.xml");
