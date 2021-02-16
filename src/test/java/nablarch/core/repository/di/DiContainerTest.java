@@ -1,18 +1,5 @@
 package nablarch.core.repository.di;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
-
-import java.io.IOException;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import org.hamcrest.CoreMatchers;
-
 import nablarch.core.repository.ObjectLoader;
 import nablarch.core.repository.di.config.DuplicateDefinitionPolicy;
 import nablarch.core.repository.di.config.xml.XmlComponentDefinitionLoader;
@@ -26,12 +13,31 @@ import nablarch.core.repository.di.test.NestedComponent;
 import nablarch.core.repository.di.test.SurrogatePair;
 import nablarch.core.repository.test.OnMemoryLogWriter;
 import nablarch.core.repository.test.SystemPropertyResource;
-
+import org.hamcrest.CoreMatchers;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+
+import java.io.IOException;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import static org.hamcrest.CoreMatchers.allOf;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.sameInstance;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 
 /**
@@ -1005,8 +1011,44 @@ public class DiContainerTest {
 
     @Test
     public void testPropertyNotFound() throws Throwable {
+        try {
+            XmlComponentDefinitionLoader loader = new XmlComponentDefinitionLoader(
+                    "nablarch/core/repository/di/DiContainerTest/testPropertyNotFound.xml");
+            new DiContainer(loader);
+            fail("例外が発生するはず");
+        } catch (ConfigurationLoadException e) {
+            // OK
+        }
+    }
+
+    @Test
+    public void testPropertyNotFoundDenyEmptyValue() throws Throwable {
+        try {
+            XmlComponentDefinitionLoader loader = new XmlComponentDefinitionLoader(
+                    "nablarch/core/repository/di/DiContainerTest/testPropertyNotFoundDenyEmptyValue.xml");
+            new DiContainer(loader);
+            fail("例外が発生するはず");
+        } catch (ConfigurationLoadException e) {
+            // OK
+        }
+    }
+
+    @Test
+    public void testPropertyNotFoundAllowEmptyValueNotSet() throws Throwable {
+        try {
+            XmlComponentDefinitionLoader loader = new XmlComponentDefinitionLoader(
+                    "nablarch/core/repository/di/DiContainerTest/testPropertyNotFoundAllowEmptyValueNotSet.xml");
+            new DiContainer(loader);
+            fail("例外が発生するはず");
+        } catch (ConfigurationLoadException e) {
+            // OK
+        }
+    }
+
+    @Test
+    public void testPropertyNotFoundAllowEmptyValue() throws Throwable {
         XmlComponentDefinitionLoader loader = new XmlComponentDefinitionLoader(
-                "nablarch/core/repository/di/DiContainerTest/testPropertyNotFound.xml");
+                "nablarch/core/repository/di/DiContainerTest/testPropertyNotFoundAllowEmptyValue.xml");
 
         DiContainer container = new DiContainer(loader);
         Component1 comp1 = container.getComponentByName("comp1");
