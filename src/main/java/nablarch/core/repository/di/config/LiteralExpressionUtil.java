@@ -1,17 +1,21 @@
 package nablarch.core.repository.di.config;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import nablarch.core.log.Logger;
 import nablarch.core.log.LoggerManager;
 import nablarch.core.repository.di.ConfigurationLoadException;
 import nablarch.core.repository.di.DiContainer;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 /**
  * リテラル表現を解決するユーティリティクラス。
- *
- * @author Koichi Asano 
+ * リテラル表現に合致する環境依存値がDIコンテナから取得できない場合、例外が発生する。
+ * 後方互換性を維持するするため、環境依存値{@literal "nablarch.diContainer.allowEmptyValue"}に
+ * {@code true}を設定することで、リテラル表現に合致する環境依存値が取得できない場合にも処理を続行する。
+ * その場合、リテラル表現の解決は行われず ${hoge} のようなリテラル表現がそのまま設定値として採用される。
+ * {@literal "nablarch.diContainer.allowEmptyValue"}の後方互換性維持以外の目的での使用は推奨しない。
+ * @author Koichi Asano
  */
 public final class LiteralExpressionUtil {
 
@@ -73,9 +77,14 @@ public final class LiteralExpressionUtil {
             
             Object value = container.getComponentByName(key);
             if (value == null) {
-                logWarn("property value was not found."
-                        + " parameter = " + group);
-                continue;
+                if (isAllowEmptyValue(container)) {
+                    logWarn("property value was not found."
+                            + " parameter = " + group);
+                    continue;
+                } else {
+                    throw new ConfigurationLoadException("property value was not found."
+                            + " parameter = " + group);
+                }
             }
             if (!(value instanceof String)) {
                 logWarn("property type was not string."
@@ -91,6 +100,20 @@ public final class LiteralExpressionUtil {
         }
         
         return builder.toString();
+    }
+
+    /**
+     * リテラル表現に合致する環境依存値が取得できないことを許容するか。
+     * @param container DIコンテナ
+     * @return 許容する場合 {@code true} 、許容しない場合 {@code false}
+     */
+    private static boolean isAllowEmptyValue(DiContainer container) {
+        Object allowEmptyValueSetting = container.getComponentByName("nablarch.diContainer.allowEmptyValue");
+        boolean allowEmptyValue = false;
+        if (allowEmptyValueSetting instanceof String) {
+            allowEmptyValue = Boolean.parseBoolean((String) allowEmptyValueSetting);
+        }
+        return allowEmptyValue;
     }
 
     /**
