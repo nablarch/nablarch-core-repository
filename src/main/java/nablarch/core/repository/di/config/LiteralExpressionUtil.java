@@ -10,11 +10,6 @@ import java.util.regex.Pattern;
 
 /**
  * リテラル表現を解決するユーティリティクラス。
- * リテラル表現に合致する環境依存値がDIコンテナから取得できない場合、例外が発生する。
- * 後方互換性を維持するするため、環境依存値{@literal "nablarch.diContainer.allowEmptyValue"}に
- * {@code true}を設定することで、リテラル表現に合致する環境依存値が取得できない場合にも処理を続行する。
- * その場合、リテラル表現の解決は行われず ${hoge} のようなリテラル表現がそのまま設定値として採用される。
- * {@literal "nablarch.diContainer.allowEmptyValue"}の後方互換性維持以外の目的での使用は推奨しない。
  * @author Koichi Asano
  */
 public final class LiteralExpressionUtil {
@@ -104,16 +99,19 @@ public final class LiteralExpressionUtil {
 
     /**
      * リテラル表現に合致する環境依存値が取得できないことを許容するか。
+     * {@link LiteralExpressionUtil#resolveVariable(DiContainer, String)}では
+     * リテラル表現に合致する環境依存値がDIコンテナから取得できない場合、例外が発生する。
+     * 後方互換性を維持するするため、環境依存値{@literal "nablarch.diContainer.allowEmptyValue"}に
+     * {@code true}を設定することで、リテラル表現に合致する環境依存値が取得できない場合にも処理を続行する。
+     * その場合、リテラル表現の解決は行われず ${hoge} のようなリテラル表現がそのまま設定値として採用される。
+     * {@literal "nablarch.diContainer.allowEmptyValue"}の後方互換性維持以外の目的での使用は推奨しない。
      * @param container DIコンテナ
      * @return 許容する場合 {@code true} 、許容しない場合 {@code false}
      */
     private static boolean isAllowEmptyValue(DiContainer container) {
-        Object allowEmptyValueSetting = container.getComponentByName("nablarch.diContainer.allowEmptyValue");
-        boolean allowEmptyValue = false;
-        if (allowEmptyValueSetting instanceof String) {
-            allowEmptyValue = Boolean.parseBoolean((String) allowEmptyValueSetting);
-        }
-        return allowEmptyValue;
+        Object allowEmptyValue = container.getComponentByName("nablarch.diContainer.allowEmptyValue");
+        return allowEmptyValue instanceof String
+                && Boolean.parseBoolean((String) allowEmptyValue);
     }
 
     /**
