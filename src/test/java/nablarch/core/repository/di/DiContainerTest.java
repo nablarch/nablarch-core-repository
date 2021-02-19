@@ -833,7 +833,7 @@ public class DiContainerTest {
             DiContainer container = new DiContainer(loader);
             fail("例外が発生するはず。");
         } catch (ContainerProcessException e) {
-            // OK
+            assertThat(e.getMessage(), containsString("recursive referenced was found."));
         }
     }
 
@@ -845,7 +845,7 @@ public class DiContainerTest {
             new DiContainer(loader);
             fail("例外が発生するはず。");
         } catch (ContainerProcessException e) {
-            // OK
+            assertThat(e.getMessage(), containsString("recursive referenced was found."));
         }
     }
 
@@ -858,7 +858,7 @@ public class DiContainerTest {
             diContainer.getComponentByName("comp1");
             fail("例外が発生するはず。");
         } catch (ContainerProcessException e) {
-            // OK
+            assertThat(e.getMessage(), containsString("recursive referenced was found."));
         }
     }
 
@@ -884,6 +884,7 @@ public class DiContainerTest {
             new DiContainer(loader);
             fail("例外が発生するはず");
         } catch (ConfigurationLoadException e) {
+            assertThat(e.getCause().getMessage(), containsString("component name was duplicated."));
         }
 
     }
@@ -908,7 +909,7 @@ public class DiContainerTest {
             new DiContainer(loader);
             fail("例外が発生するはず");
         } catch (ConfigurationLoadException e) {
-            // OK
+            assertThat(e.getCause().getMessage(), containsString("property not found in  class."));
         }
     }
 
@@ -920,7 +921,7 @@ public class DiContainerTest {
             new DiContainer(loader);
             fail("例外が発生するはず");
         } catch (ConfigurationLoadException e) {
-            // OK
+            assertThat(e.getCause().getMessage(), containsString("component definition load failed."));
         }
     }
 
@@ -968,7 +969,8 @@ public class DiContainerTest {
             new DiContainer(loader);
             fail("例外が発生するはず");
         } catch (ConfigurationLoadException e) {
-            // OK
+            assertThat(e.getCause().getMessage(), containsString("component class load failed."));
+            assertThat(e.getCause().getCause(), CoreMatchers.<Throwable>instanceOf(ClassNotFoundException.class));
         }
     }
 
@@ -980,7 +982,7 @@ public class DiContainerTest {
             new DiContainer(loader);
             fail("例外が発生するはず");
         } catch (ConfigurationLoadException e) {
-            // OK
+            assertThat(e.getCause().getMessage(), containsString("property value was not found."));
         }
     }
 
@@ -993,7 +995,7 @@ public class DiContainerTest {
             new DiContainer(loader);
             fail("例外が発生するはず");
         } catch (ConfigurationLoadException e) {
-            // OK
+            assertThat(e.getCause().getMessage(), containsString("map entry must have key value."));
         }
     }
 
@@ -1005,7 +1007,7 @@ public class DiContainerTest {
             new DiContainer(loader);
             fail("例外が発生するはず");
         } catch (ConfigurationLoadException e) {
-            // OK
+            assertThat(e.getCause().getMessage(), containsString("map entry must have key value."));
         }
     }
 
@@ -1017,7 +1019,7 @@ public class DiContainerTest {
             new DiContainer(loader);
             fail("例外が発生するはず");
         } catch (ConfigurationLoadException e) {
-            // OK
+            assertThat(e.getMessage(), containsString("property value was not found."));
         }
     }
 
@@ -1029,7 +1031,7 @@ public class DiContainerTest {
             new DiContainer(loader);
             fail("例外が発生するはず");
         } catch (ConfigurationLoadException e) {
-            // OK
+            assertThat(e.getMessage(), containsString("property value was not found."));
         }
     }
 
@@ -1041,7 +1043,7 @@ public class DiContainerTest {
             new DiContainer(loader);
             fail("例外が発生するはず");
         } catch (ConfigurationLoadException e) {
-            // OK
+            assertThat(e.getMessage(), containsString("property value was not found."));
         }
     }
 
@@ -1075,7 +1077,7 @@ public class DiContainerTest {
             DiContainer container = new DiContainer(loader);
             fail("コンポーネントファクトリ間で循環参照がある場合、例外が発生するはず");
         } catch (ContainerProcessException e) {
-            // OK
+            assertThat(e.getMessage(), containsString("recursive referenced was found."));
         }
     }
 
@@ -1101,7 +1103,7 @@ public class DiContainerTest {
             container.getComponentById(-1);
             fail("例外が発生するはず");
         } catch (ContainerProcessException e) {
-            // OK
+            assertThat(e.getMessage(), containsString("component id was not found."));
         }
     }
 
@@ -1125,7 +1127,7 @@ public class DiContainerTest {
                 new DiContainer(loader);
                 fail("例外が発生するはず");
             } catch (ConfigurationLoadException e) {
-                // OK
+                assertThat(e.getMessage(), containsString("property type was not supported."));
             }
         }
 
@@ -1136,7 +1138,7 @@ public class DiContainerTest {
                 new DiContainer(loader);
                 fail("例外が発生するはず");
             } catch (ConfigurationLoadException e) {
-                // OK
+                assertThat(e.getMessage(), containsString("property value conversion failed."));
             }
         }
 
@@ -1148,7 +1150,7 @@ public class DiContainerTest {
                 new DiContainer(loader);
                 fail("例外が発生するはず");
             } catch (ConfigurationLoadException e) {
-                // OK
+                assertThat(e.getMessage(), containsString("property value conversion failed."));
             }
         }
 
@@ -1159,7 +1161,7 @@ public class DiContainerTest {
                 new DiContainer(loader);
                 fail("例外が発生するはず");
             } catch (ConfigurationLoadException e) {
-                // OK
+                assertThat(e.getMessage(), containsString("property type was not supported."));
             }
         }
     }
@@ -1173,7 +1175,7 @@ public class DiContainerTest {
             new DiContainer(loader);
             fail("例外が発生するはず");
         } catch (ContainerProcessException e) {
-
+            assertThat(e.getMessage(), containsString("list entry component was not found."));
         }
 
     }
@@ -1186,7 +1188,7 @@ public class DiContainerTest {
             new DiContainer(loader);
             fail("例外が発生するはず");
         } catch (ContainerProcessException e) {
-
+            assertThat(e.getMessage(), containsString("map entry key component name was not found."));
         }
 
     }
@@ -1199,7 +1201,7 @@ public class DiContainerTest {
             new DiContainer(loader);
             fail("例外が発生するはず");
         } catch (ContainerProcessException e) {
-
+            assertThat(e.getMessage(), containsString("map entry value component name was not found."));
         }
     }
 
@@ -1222,7 +1224,7 @@ public class DiContainerTest {
                 new DiContainer(loader);
                 fail("例外が発生するはず");
             } catch (ContainerProcessException e) {
-
+                assertThat(e.getMessage(), containsString("component instantiation failed."));
             }
         }
         
@@ -1233,7 +1235,7 @@ public class DiContainerTest {
                 new DiContainer(loader);
                 fail("例外が発生するはず");
             } catch (ContainerProcessException e) {
-
+                assertThat(e.getMessage(), containsString("component instantiation failed."));
             }
         }
     }
@@ -1248,7 +1250,7 @@ public class DiContainerTest {
                 new DiContainer(loader);
                 fail("例外が発生するはず");
             } catch (ContainerProcessException e) {
-
+                assertThat(e.getCause().getMessage(), containsString("map entry must have key value."));
             }
         }
 
@@ -1258,7 +1260,7 @@ public class DiContainerTest {
             new DiContainer(loader);
             fail("例外が発生するはず");
         } catch (ContainerProcessException e) {
-
+            assertThat(e.getCause().getMessage(), containsString("map entry must have key value."));
         }
     }
 
