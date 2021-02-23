@@ -512,6 +512,7 @@ public class DiContainerTest {
             fail();
         } catch (IllegalStateException e) {
             assertThat(e.getMessage(), containsString("directory not found."));
+            assertThat(e.getMessage(), containsString("NonExists"));
         }
         
         /*
@@ -680,6 +681,7 @@ public class DiContainerTest {
             fail();
         } catch (IllegalStateException e) {
             assertThat(e.getMessage(), containsString("directory not found."));
+            assertThat(e.getMessage(), containsString("nonExists"));
         }
         
 
@@ -833,7 +835,7 @@ public class DiContainerTest {
             DiContainer container = new DiContainer(loader);
             fail("例外が発生するはず。");
         } catch (ContainerProcessException e) {
-            assertThat(e.getMessage(), containsString("recursive referenced was found."));
+            assertThat(e.getMessage(), containsString("recursive referenced was found. component name = [comp1]"));
         }
     }
 
@@ -845,7 +847,7 @@ public class DiContainerTest {
             new DiContainer(loader);
             fail("例外が発生するはず。");
         } catch (ContainerProcessException e) {
-            assertThat(e.getMessage(), containsString("recursive referenced was found."));
+            assertThat(e.getMessage(), containsString("recursive referenced was found. component name = [comp1]"));
         }
     }
 
@@ -858,7 +860,7 @@ public class DiContainerTest {
             diContainer.getComponentByName("comp1");
             fail("例外が発生するはず。");
         } catch (ContainerProcessException e) {
-            assertThat(e.getMessage(), containsString("recursive referenced was found."));
+            assertThat(e.getMessage(), containsString("recursive referenced was found. component name = [comp1]"));
         }
     }
 
@@ -884,7 +886,7 @@ public class DiContainerTest {
             new DiContainer(loader);
             fail("例外が発生するはず");
         } catch (ConfigurationLoadException e) {
-            assertThat(e.getCause().getMessage(), containsString("component name was duplicated."));
+            assertThat(e.getCause().getMessage(), containsString("component name was duplicated. name = comp1"));
         }
 
     }
@@ -909,7 +911,7 @@ public class DiContainerTest {
             new DiContainer(loader);
             fail("例外が発生するはず");
         } catch (ConfigurationLoadException e) {
-            assertThat(e.getCause().getMessage(), containsString("property not found in  class."));
+            assertThat(e.getCause().getMessage(), containsString("property not found in  class. propertyName = prop3, className = nablarch.core.repository.di.test.Component4"));
         }
     }
 
@@ -982,7 +984,7 @@ public class DiContainerTest {
             new DiContainer(loader);
             fail("例外が発生するはず");
         } catch (ConfigurationLoadException e) {
-            assertThat(e.getCause().getMessage(), containsString("property value was not found."));
+            assertThat(e.getCause().getMessage(), containsString("property value was not found. propertyName = prop1"));
         }
     }
 
@@ -1019,7 +1021,7 @@ public class DiContainerTest {
             new DiContainer(loader);
             fail("例外が発生するはず");
         } catch (ConfigurationLoadException e) {
-            assertThat(e.getMessage(), containsString("property value was not found."));
+            assertThat(e.getMessage(), containsString("property value was not found. parameter = ${test.prop}"));
         }
     }
 
@@ -1031,7 +1033,7 @@ public class DiContainerTest {
             new DiContainer(loader);
             fail("例外が発生するはず");
         } catch (ConfigurationLoadException e) {
-            assertThat(e.getMessage(), containsString("property value was not found."));
+            assertThat(e.getMessage(), containsString("property value was not found. parameter = ${test.prop}"));
         }
     }
 
@@ -1043,7 +1045,7 @@ public class DiContainerTest {
             new DiContainer(loader);
             fail("例外が発生するはず");
         } catch (ConfigurationLoadException e) {
-            assertThat(e.getMessage(), containsString("property value was not found."));
+            assertThat(e.getMessage(), containsString("property value was not found. parameter = ${test.prop}"));
         }
     }
 
@@ -1055,6 +1057,7 @@ public class DiContainerTest {
         DiContainer container = new DiContainer(loader);
         Component1 comp1 = container.getComponentByName("comp1");
         assertThat(comp1.getProp1(), is("${test.prop}"));
+        OnMemoryLogWriter.assertLogContains("writer.appLog", "WARN ROOT property value was not found. parameter = ${test.prop}");
     }
 
     @Test
@@ -1077,7 +1080,7 @@ public class DiContainerTest {
             DiContainer container = new DiContainer(loader);
             fail("コンポーネントファクトリ間で循環参照がある場合、例外が発生するはず");
         } catch (ContainerProcessException e) {
-            assertThat(e.getMessage(), containsString("recursive referenced was found."));
+            assertThat(e.getMessage(), containsString("recursive referenced was found. component name = [ref1]"));
         }
     }
 
@@ -1103,7 +1106,7 @@ public class DiContainerTest {
             container.getComponentById(-1);
             fail("例外が発生するはず");
         } catch (ContainerProcessException e) {
-            assertThat(e.getMessage(), containsString("component id was not found."));
+            assertThat(e.getMessage(), containsString("component id was not found. component id = [-1]"));
         }
     }
 
@@ -1127,7 +1130,7 @@ public class DiContainerTest {
                 new DiContainer(loader);
                 fail("例外が発生するはず");
             } catch (ConfigurationLoadException e) {
-                assertThat(e.getMessage(), containsString("property type was not supported."));
+                assertThat(e.getMessage(), containsString("property type was not supported. class name = nablarch.core.repository.di.test.Component2"));
             }
         }
 
@@ -1138,7 +1141,7 @@ public class DiContainerTest {
                 new DiContainer(loader);
                 fail("例外が発生するはず");
             } catch (ConfigurationLoadException e) {
-                assertThat(e.getMessage(), containsString("property value conversion failed."));
+                assertThat(e.getMessage(), containsString("property value conversion failed. class name = [I ,value = a"));
             }
         }
 
@@ -1150,7 +1153,7 @@ public class DiContainerTest {
                 new DiContainer(loader);
                 fail("例外が発生するはず");
             } catch (ConfigurationLoadException e) {
-                assertThat(e.getMessage(), containsString("property value conversion failed."));
+                assertThat(e.getMessage(), containsString("property value conversion failed. class name = [Ljava.lang.Integer; ,value = a"));
             }
         }
 
@@ -1161,7 +1164,7 @@ public class DiContainerTest {
                 new DiContainer(loader);
                 fail("例外が発生するはず");
             } catch (ConfigurationLoadException e) {
-                assertThat(e.getMessage(), containsString("property type was not supported."));
+                assertThat(e.getMessage(), containsString("property type was not supported. class name = [J"));
             }
         }
     }
@@ -1175,7 +1178,7 @@ public class DiContainerTest {
             new DiContainer(loader);
             fail("例外が発生するはず");
         } catch (ContainerProcessException e) {
-            assertThat(e.getMessage(), containsString("list entry component was not found."));
+            assertThat(e.getMessage(), containsString("list entry component was not found.name = outComponent"));
         }
 
     }
@@ -1188,7 +1191,7 @@ public class DiContainerTest {
             new DiContainer(loader);
             fail("例外が発生するはず");
         } catch (ContainerProcessException e) {
-            assertThat(e.getMessage(), containsString("map entry key component name was not found."));
+            assertThat(e.getMessage(), containsString("map entry key component name was not found. name = key-component"));
         }
 
     }
@@ -1201,7 +1204,7 @@ public class DiContainerTest {
             new DiContainer(loader);
             fail("例外が発生するはず");
         } catch (ContainerProcessException e) {
-            assertThat(e.getMessage(), containsString("map entry value component name was not found."));
+            assertThat(e.getMessage(), containsString("map entry value component name was not found. name = component2"));
         }
     }
 
@@ -1224,7 +1227,7 @@ public class DiContainerTest {
                 new DiContainer(loader);
                 fail("例外が発生するはず");
             } catch (ContainerProcessException e) {
-                assertThat(e.getMessage(), containsString("component instantiation failed."));
+                assertThat(e.getMessage(), containsString("component instantiation failed. component class name = class nablarch.core.util.FileUtil"));
             }
         }
         
@@ -1235,7 +1238,7 @@ public class DiContainerTest {
                 new DiContainer(loader);
                 fail("例外が発生するはず");
             } catch (ContainerProcessException e) {
-                assertThat(e.getMessage(), containsString("component instantiation failed."));
+                assertThat(e.getMessage(), containsString("component instantiation failed. component class name = class nablarch.core.repository.di.test.DefaultConstructorLessObject"));
             }
         }
     }
