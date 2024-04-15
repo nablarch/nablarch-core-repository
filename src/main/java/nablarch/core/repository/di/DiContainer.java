@@ -28,10 +28,10 @@ import nablarch.core.util.annotation.Published;
 
 
 /**
- * DIコンテナの機能を実現するクラス。
+ * DIコンテナの機能を実現するクラス。<br/>
  *
  * staticプロパティへのインジェクションは行われない。
- * インジェクションの対象となるプロパティがstaticである場合、例外が発生する。
+ * インジェクションの対象となるプロパティがstaticである場合、例外が発生する。<br/>
  *
  * 後方互換性を維持するするため、システムプロパティ{@literal "nablarch.diContainer.allowStaticInjection"}に
  * {@code true}を設定することで、staticプロパティへのインジェクションを許可できる。
@@ -72,7 +72,7 @@ public class DiContainer implements ObjectLoader {
     /**
      * 循環参照の情報を保持するための参照スタック。
      */
-    private ReferenceStack refStack = new ReferenceStack();
+    private final ReferenceStack refStack = new ReferenceStack();
 
     /** staticプロパティへのインジェクションを許容するかどうか。 */
     private final boolean allowStaticInjection;
@@ -130,7 +130,7 @@ public class DiContainer implements ObjectLoader {
     /**
      * コンポーネント定義のローダ
      */
-    private ComponentDefinitionLoader loader;
+    private final ComponentDefinitionLoader loader;
 
     /**
      * コンポーネントIDの最大値。
@@ -414,7 +414,7 @@ public class DiContainer implements ObjectLoader {
     }
 
     /**
-     * オブジェクトに対してインジェクションを実行する。
+     * オブジェクトに対してインジェクションを実行する。<br/>
      *
      * この際、オブジェクトが作成されていない場合、コンポーネントの作成も行う。
      *
