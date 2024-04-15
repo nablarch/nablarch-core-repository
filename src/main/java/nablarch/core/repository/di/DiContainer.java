@@ -319,13 +319,8 @@ public class DiContainer implements ObjectLoader {
             nameIndex.put(def.getName(), holder);
         }
 
-        if (def.getClass() != null) {
-            if (!def.isUseIdOnly()) {
-                registerTypes(def, holder);
-            }
-        } else {
-            // 設定ファイルで落とすため、通常ここには到達しない。
-            throw new ContainerProcessException("component class was not specified");
+        if (!def.isUseIdOnly()) {
+            registerTypes(def, holder);
         }
     }
 
