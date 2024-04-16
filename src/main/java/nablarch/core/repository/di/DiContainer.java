@@ -234,7 +234,7 @@ public class DiContainer implements ObjectLoader {
         }
 
         // 初期化対象クラスを初期化する。
-        ApplicationInitializer initializer = (ApplicationInitializer) this.getComponentByName("initializer");
+        ApplicationInitializer initializer = this.getComponentByName("initializer");
         if (initializer != null) {
             initializer.initialize();
         }
