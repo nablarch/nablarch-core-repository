@@ -29,10 +29,10 @@ import nablarch.core.util.annotation.Published;
 
 /**
  * DIコンテナの機能を実現するクラス。
- *
+ *<p>
  * staticプロパティへのインジェクションは行われない。
  * インジェクションの対象となるプロパティがstaticである場合、例外が発生する。
- *
+ *<p>
  * 後方互換性を維持するするため、システムプロパティ{@literal "nablarch.diContainer.allowStaticInjection"}に
  * {@code true}を設定することで、staticプロパティへのインジェクションを許可できる。
  * 後方互換性維持以外の目的での使用は推奨しない。
@@ -72,7 +72,7 @@ public class DiContainer implements ObjectLoader {
     /**
      * 循環参照の情報を保持するための参照スタック。
      */
-    private ReferenceStack refStack = new ReferenceStack();
+    private final ReferenceStack refStack = new ReferenceStack();
 
     /** staticプロパティへのインジェクションを許容するかどうか。 */
     private final boolean allowStaticInjection;
@@ -130,7 +130,7 @@ public class DiContainer implements ObjectLoader {
     /**
      * コンポーネント定義のローダ
      */
-    private ComponentDefinitionLoader loader;
+    private final ComponentDefinitionLoader loader;
 
     /**
      * コンポーネントIDの最大値。
@@ -234,7 +234,7 @@ public class DiContainer implements ObjectLoader {
         }
 
         // 初期化対象クラスを初期化する。
-        ApplicationInitializer initializer = (ApplicationInitializer) this.getComponentByName("initializer");
+        ApplicationInitializer initializer = this.getComponentByName("initializer");
         if (initializer != null) {
             initializer.initialize();
         }
@@ -319,13 +319,8 @@ public class DiContainer implements ObjectLoader {
             nameIndex.put(def.getName(), holder);
         }
 
-        if (def.getClass() != null) {
-            if (!def.isUseIdOnly()) {
-                registerTypes(def, holder);
-            }
-        } else {
-            // 設定ファイルで落とすため、通常ここには到達しない。
-            throw new ContainerProcessException("component class was not specified");
+        if (!def.isUseIdOnly()) {
+            registerTypes(def, holder);
         }
     }
 
@@ -420,7 +415,7 @@ public class DiContainer implements ObjectLoader {
 
     /**
      * オブジェクトに対してインジェクションを実行する。
-     *
+     *<p>
      * この際、オブジェクトが作成されていない場合、コンポーネントの作成も行う。
      *
      * @param holder コンポーネントホルダ
