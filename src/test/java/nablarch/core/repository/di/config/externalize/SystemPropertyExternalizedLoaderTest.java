@@ -1,7 +1,5 @@
 package nablarch.core.repository.di.config.externalize;
 
-import nablarch.core.repository.di.ComponentDefinition;
-import nablarch.core.repository.di.ComponentHolder;
 import nablarch.core.repository.di.DiContainer;
 import nablarch.core.repository.di.SimpleComponentDefinitionLoader;
 import nablarch.core.repository.test.OnMemoryLogWriter;
@@ -11,7 +9,6 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
