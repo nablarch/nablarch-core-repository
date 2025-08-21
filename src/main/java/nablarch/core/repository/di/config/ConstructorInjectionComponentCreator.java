@@ -10,6 +10,8 @@ import nablarch.core.repository.di.config.externalize.annotation.ConfigValue;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.RecordComponent;
+import java.util.stream.Stream;
 
 /**
  * コンストラクタインジェクションできるよう拡張した{@link BeanComponentCreator}。
@@ -18,12 +20,35 @@ public class ConstructorInjectionComponentCreator extends BeanComponentCreator {
 
     @Override
     public Object createComponent(DiContainer container, ComponentDefinition def) {
-        Constructor<?>[] constructors = def.getType().getConstructors();
+        Class<?> defClass = def.getType();
+
+        if (defClass.isRecord()){
+            Constructor<?> constructor = getCanonicalConstructor(defClass);
+            return createComponentWithConstructorInjection(container, constructor);
+        }
+
+        Constructor<?>[] constructors = defClass.getConstructors();
         if (constructors.length == 1 && constructors[0].getParameterTypes().length != 0) {
             // 生成時に利用するコンストラクタが特定できるなら、コンストラクタインジェクションを行う
             return createComponentWithConstructorInjection(container, constructors[0]);
         }
         return super.createComponent(container, def);
+    }
+
+    private static Constructor<?> getCanonicalConstructor(Class<?> cls) {
+        // see https://docs.oracle.com/javase/jp/17/docs/api/java.base/java/lang/Class.html#getRecordComponents()
+        try {
+            Class<?>[] paramTypes =
+                    Stream.of(cls.getRecordComponents())
+                            .map(RecordComponent::getType)
+                            .toArray(Class<?>[]::new);
+            return cls.getDeclaredConstructor(paramTypes);
+        } catch (NoSuchMethodException e) {
+            throw new ContainerProcessException(
+                    "(record) component instantiation failed."
+                            + " component class name = " + cls
+                    , e);
+        }
     }
 
     /**

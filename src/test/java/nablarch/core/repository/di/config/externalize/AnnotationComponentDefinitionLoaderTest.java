@@ -6,11 +6,7 @@ import nablarch.core.repository.di.DiContainer;
 import nablarch.core.repository.di.SimpleComponentDefinitionLoader;
 import nablarch.core.repository.di.config.xml.XmlComponentDefinitionLoader;
 import nablarch.core.repository.test.ContextClassLoaderExchanger;
-import nablarch.core.repository.test.component.normal.TestComponent;
-import nablarch.core.repository.test.component.normal.TestInjectionComponent;
-import nablarch.core.repository.test.component.normal.TestMultipleConstructorComponent;
-import nablarch.core.repository.test.component.normal.TestNamingComponent;
-import nablarch.core.repository.test.component.normal.TestReferenceInjectionComponent;
+import nablarch.core.repository.test.component.normal.*;
 import nablarch.core.util.ClassTraversal;
 import nablarch.core.util.ResourcesUtil;
 import org.junit.Rule;
@@ -98,6 +94,53 @@ public class AnnotationComponentDefinitionLoaderTest {
         assertEquals(TestReferenceInjectionComponent.class, refInjectedComponent.getClass());
         assertNotNull(((TestReferenceInjectionComponent) refInjectedComponent).getComponent());
         assertEquals("dummy", ((TestReferenceInjectionComponent) refInjectedComponent).getComponent().getProperty());
+    }
+
+    @Test
+    public void testRecord() {
+        // ExternalizedComponentDefinitionLoaderとしてSystemUnderTestを読み込む
+        exchanger.setupContextClassLoader("normalAnnotation");
+        // コンストラクタインジェクション用の設定値を読み込むローダー
+        XmlComponentDefinitionLoader loader = new XmlComponentDefinitionLoader(
+                "nablarch/core/repository/di/config/externalize/test-record.xml");
+        DiContainer container = new DiContainer(loader);
+
+        // (レコード版)コンストラクタインジェクションのコンポーネント
+        Object injectedRecordComponent = container.getComponentByName(TestInjectionRecordComponent.class.getName());
+        assertNotNull(injectedRecordComponent);
+        assertEquals(TestInjectionRecordComponent.class, injectedRecordComponent.getClass());
+        TestInjectionRecordComponent TestInjectionRecordComponent = (TestInjectionRecordComponent) injectedRecordComponent;
+        assertNotNull(TestInjectionRecordComponent.component());
+        assertNotNull(TestInjectionRecordComponent.component().component());
+        assertThat(TestInjectionRecordComponent.stringConfig(), is("value"));
+        assertThat(TestInjectionRecordComponent.stringArrayConfig(), is(new String[]{"a", "b", "c"}));
+        assertThat(TestInjectionRecordComponent.intConfig(), is(2));
+        assertThat(TestInjectionRecordComponent.intArrayConfig(), is(new int[]{1, 2, 3}));
+        assertThat(TestInjectionRecordComponent.longConfig(), is(8L));
+        assertTrue(TestInjectionRecordComponent.booleanConfig());
+        assertNull(TestInjectionRecordComponent.dummy());
+
+        // (レコード版)コンストラクタインジェクションかつ、カノニカルコンストラクタにアノテーションを定義するコンポーネント
+        Object injectedRecordCanonicalComponent = container.getComponentByName(TestInjectionRecordCanonicalComponent.class.getName());
+        assertNotNull(injectedRecordCanonicalComponent);
+        assertEquals(TestInjectionRecordCanonicalComponent.class, injectedRecordCanonicalComponent.getClass());
+        TestInjectionRecordCanonicalComponent TestInjectionRecordCanonicalComponent = (TestInjectionRecordCanonicalComponent) injectedRecordCanonicalComponent;
+        assertNotNull(TestInjectionRecordCanonicalComponent.component());
+        assertNotNull(TestInjectionRecordCanonicalComponent.component().component());
+        assertThat(TestInjectionRecordCanonicalComponent.stringConfig(), is("value"));
+        assertThat(TestInjectionRecordCanonicalComponent.stringArrayConfig(), is(new String[]{"a", "b", "c"}));
+        assertThat(TestInjectionRecordCanonicalComponent.intConfig(), is(2));
+        assertThat(TestInjectionRecordCanonicalComponent.intArrayConfig(), is(new int[]{1, 2, 3}));
+        assertThat(TestInjectionRecordCanonicalComponent.longConfig(), is(8L));
+        assertTrue(TestInjectionRecordCanonicalComponent.booleanConfig());
+        assertNull(TestInjectionRecordCanonicalComponent.dummy());
+
+        // (レコード版)コンポーネント参照によるコンストラクタインジェクションのコンポーネント
+        Object refInjectedRecordComponent = container.getComponentByName(TestReferenceInjectionRecordComponent.class.getName());
+        assertNotNull(refInjectedRecordComponent);
+        assertEquals(TestReferenceInjectionRecordComponent.class, refInjectedRecordComponent.getClass());
+        assertNotNull(((TestReferenceInjectionRecordComponent) refInjectedRecordComponent).component());
+        assertEquals("dummy", ((TestReferenceInjectionRecordComponent) refInjectedRecordComponent).component().property());
     }
 
     @Rule
