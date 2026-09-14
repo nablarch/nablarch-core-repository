@@ -8,4 +8,8 @@ public class TestComponent {
     @SystemRepositoryComponent
     public static class TestInnerComponent {
     }
+
+    @SystemRepositoryComponent
+    public static record TestInnerRecordComponent(TestComponent component) {
+    }
 }
