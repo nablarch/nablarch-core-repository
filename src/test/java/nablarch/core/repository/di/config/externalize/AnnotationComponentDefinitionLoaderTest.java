@@ -10,6 +10,9 @@ import nablarch.core.repository.test.component.normal.TestComponent;
 import nablarch.core.repository.test.component.normal.TestInjectionComponent;
 import nablarch.core.repository.test.component.normal.TestMultipleConstructorComponent;
 import nablarch.core.repository.test.component.normal.TestNamingComponent;
+import nablarch.core.repository.test.component.normal.TestNoArgRecordComponent;
+import nablarch.core.repository.test.component.normal.TestRecordComponent;
+import nablarch.core.repository.test.component.normal.TestRecordInjectionComponent;
 import nablarch.core.repository.test.component.normal.TestReferenceInjectionComponent;
 import nablarch.core.util.ClassTraversal;
 import nablarch.core.util.ResourcesUtil;
@@ -98,6 +101,45 @@ public class AnnotationComponentDefinitionLoaderTest {
         assertEquals(TestReferenceInjectionComponent.class, refInjectedComponent.getClass());
         assertNotNull(((TestReferenceInjectionComponent) refInjectedComponent).getComponent());
         assertEquals("dummy", ((TestReferenceInjectionComponent) refInjectedComponent).getComponent().getProperty());
+    }
+
+    @Test
+    public void testNormalRecord() {
+        // ExternalizedComponentDefinitionLoaderとしてSystemUnderTestを読み込む
+        exchanger.setupContextClassLoader("normalAnnotation");
+        // コンストラクタインジェクション用の設定値を読み込むローダー
+        XmlComponentDefinitionLoader loader = new XmlComponentDefinitionLoader(
+                "nablarch/core/repository/di/config/externalize/test.xml");
+        DiContainer container = new DiContainer(loader);
+
+        // 型で引数を解決するrecordのコンポーネント
+        Object recordComponent = container.getComponentByName(TestRecordComponent.class.getName());
+        assertNotNull(recordComponent);
+        assertEquals(TestRecordComponent.class, recordComponent.getClass());
+        assertNotNull(((TestRecordComponent) recordComponent).component());
+
+        // 引数のないrecordのコンポーネント
+        Object noArgRecordComponent = container.getComponentByName(TestNoArgRecordComponent.class.getName());
+        assertNotNull(noArgRecordComponent);
+        assertEquals(TestNoArgRecordComponent.class, noArgRecordComponent.getClass());
+
+        // クラスにネストしたrecordのコンポーネント
+        Object innerRecordComponent = container.getComponentByName(TestComponent.TestInnerRecordComponent.class.getName());
+        assertNotNull(innerRecordComponent);
+        assertEquals(TestComponent.TestInnerRecordComponent.class, innerRecordComponent.getClass());
+        assertNotNull(((TestComponent.TestInnerRecordComponent) innerRecordComponent).component());
+
+        // ConfigValue、ComponentRefで引数を解決するrecordのコンポーネント
+        Object recordInjectedComponent = container.getComponentByName(TestRecordInjectionComponent.class.getName());
+        assertNotNull(recordInjectedComponent);
+        assertEquals(TestRecordInjectionComponent.class, recordInjectedComponent.getClass());
+        TestRecordInjectionComponent testRecordInjectionComponent = (TestRecordInjectionComponent) recordInjectedComponent;
+        assertNotNull(testRecordInjectionComponent.component());
+        assertNotNull(testRecordInjectionComponent.component().getComponent());
+        assertThat(testRecordInjectionComponent.stringConfig(), is("value"));
+        assertThat(testRecordInjectionComponent.intConfig(), is(2));
+        assertNotNull(testRecordInjectionComponent.refComponent());
+        assertEquals("dummy", testRecordInjectionComponent.refComponent().getProperty());
     }
 
     @Rule
@@ -206,6 +248,27 @@ public class AnnotationComponentDefinitionLoaderTest {
         expectedException.expectCause(isA(InstantiationException.class));
 
         exchanger.setupContextClassLoader("abnormalAnnotation/instantiation");
+        new DiContainer(new SimpleComponentDefinitionLoader());
+        fail("ここに到達したらExceptionが発生していない。");
+    }
+
+    public static class TestNonPublicRecordLoader extends AnnotationComponentDefinitionLoader {
+        @Override
+        protected String getBasePackage() {
+            return "nablarch.core.repository.test.component.abnormal.nonPublicRecord";
+        }
+    }
+
+    @Test
+    public void testAbnormalNonPublicRecord() {
+        // publicでないrecordはpublicなコンストラクタを持たないためコンストラクタインジェクションの対象にならず、
+        // デフォルトコンストラクタによる生成も失敗する
+        expectedException.expect(ContainerProcessException.class);
+        expectedException.expectMessage("component instantiation failed. " +
+                "component class name = class nablarch.core.repository.test.component.abnormal.nonPublicRecord.TestNonPublicRecordComponent");
+        expectedException.expectCause(isA(InstantiationException.class));
+
+        exchanger.setupContextClassLoader("abnormalAnnotation/nonPublicRecord");
         new DiContainer(new SimpleComponentDefinitionLoader());
         fail("ここに到達したらExceptionが発生していない。");
     }
